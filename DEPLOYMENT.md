@@ -54,17 +54,24 @@ Quick Start:
 - ✅ Support Laravel
 - ✅ PostgreSQL support
 - ✅ Auto-deploy dari GitHub
+- ⚠️ Free tier akan sleep setelah 15 menit tidak aktif
 
 **Setup:**
+📖 **Lihat [RENDER_SETUP.md](RENDER_SETUP.md) untuk panduan lengkap step-by-step**
+
+Quick Start:
 1. Sign up di [render.com](https://render.com)
-2. New → Web Service
-3. Connect GitHub repository
-4. Build command: `composer install && php artisan migrate`
-5. Start command: `php artisan serve --host=0.0.0.0 --port=$PORT`
-6. Add PostgreSQL database
-7. Set environment variables
+2. **Buat PostgreSQL database DULU** (penting!)
+3. New → Web Service
+4. Connect GitHub repository
+5. Build command: `composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache && php artisan view:cache`
+6. Start command: `php artisan serve --host=0.0.0.0 --port=$PORT`
+7. Set environment variables (APP_KEY, database, dll)
+8. Deploy
 
 **Link akan muncul:** `https://your-project.onrender.com`
+
+**Catatan**: File `render.yaml` sudah tersedia untuk konfigurasi otomatis (opsional).
 
 ---
 
