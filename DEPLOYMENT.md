@@ -14,31 +14,21 @@
 - ✅ Gratis untuk personal projects
 - ✅ Auto-deploy dari GitHub
 - ✅ Environment variables support
+- ⚠️ **TIDAK menyediakan database** (perlu external database)
 
 **Setup:**
-1. Install Vercel CLI: `npm i -g vercel`
-2. Buat file `vercel.json` di root project:
-```json
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "public/index.php",
-      "use": "@vercel/php"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "public/$1"
-    }
-  ]
-}
-```
-3. Deploy: `vercel --prod`
-4. Atau connect GitHub repo di dashboard Vercel
+📖 **Lihat [VERCEL_SETUP.md](VERCEL_SETUP.md) untuk panduan lengkap**
+
+Quick Start:
+1. File `vercel.json` sudah dibuat di project
+2. Sign up di [vercel.com](https://vercel.com)
+3. Import project dari GitHub
+4. Set environment variables
+5. Deploy
 
 **Link akan muncul:** `https://your-project.vercel.app`
+
+**Catatan**: Vercel tidak menyediakan database. Gunakan Supabase, Railway, atau Render untuk database PostgreSQL.
 
 ---
 
