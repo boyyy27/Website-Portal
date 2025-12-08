@@ -1,64 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# OMILE - Transport Management System Portal
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Portal pembayaran untuk Transport Management System (TMS) yang memungkinkan user untuk berlangganan paket dan mengakses sistem TMS.
 
-## About Laravel
+## 🚀 Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Framework**: Laravel 8.75
+- **Database**: PostgreSQL
+- **Payment Gateway**: Midtrans
+- **Frontend**: Bootstrap 5.3.0, Material Design Icons
+- **Styling**: Custom CSS (Open Sans font)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📋 Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- ✅ User Authentication (Register, Login, Email Verification)
+- ✅ Package Management (Admin)
+- ✅ Dynamic Package Features
+- ✅ Payment Integration (Midtrans)
+- ✅ Transaction Management
+- ✅ User Dashboard
+- ✅ Admin Dashboard
+- ✅ TMS Access Integration
 
-## Learning Laravel
+## ⚠️ Important: GitHub Pages Limitation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**GitHub Pages TIDAK BISA digunakan untuk project ini** karena:
+- GitHub Pages hanya support static files (HTML, CSS, JS)
+- Laravel memerlukan PHP server dan database
+- Laravel memerlukan environment variables (.env)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Solusi**: Gunakan platform deployment yang support Laravel seperti:
+- **Railway** (Recommended) - [railway.app](https://railway.app)
+- **Render** - [render.com](https://render.com)
+- **Vercel** - [vercel.com](https://vercel.com)
+- **Heroku** - [heroku.com](https://heroku.com)
 
-## Laravel Sponsors
+📖 **Lihat [DEPLOYMENT.md](DEPLOYMENT.md) untuk panduan deployment lengkap**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## 🛠️ Installation
 
-### Premium Partners
+### Requirements
+- PHP 7.3+ atau 8.0+
+- PostgreSQL 10+
+- Composer
+- Node.js & NPM
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+### Setup
 
-## Contributing
+1. Clone repository:
+```bash
+git clone https://github.com/boyyy27/Website-Portal.git
+cd Website-Portal
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. Install dependencies:
+```bash
+composer install
+npm install
+```
 
-## Code of Conduct
+3. Copy environment file:
+```bash
+cp .env.example .env
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. Generate application key:
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+5. Setup database di `.env`:
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. Run migrations:
+```bash
+php artisan migrate
+```
 
-## License
+7. Seed packages (optional):
+```bash
+php artisan db:seed --class=PackageSeeder
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+8. Setup Midtrans keys di `.env`:
+```env
+MIDTRANS_CLIENT_KEY=your_client_key
+MIDTRANS_SERVER_KEY=your_server_key
+MIDTRANS_IS_PRODUCTION=false
+```
+
+9. Build assets:
+```bash
+npm run production
+```
+
+10. Start server:
+```bash
+php artisan serve
+```
+
+## 📚 Documentation
+
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Panduan deployment
+- [DATABASE_SETUP.md](DATABASE_SETUP.md) - Setup database
+- [MIDTRANS_SETUP.md](MIDTRANS_SETUP.md) - Setup payment gateway
+- [EMAIL_SETUP.md](EMAIL_SETUP.md) - Setup email
+- [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md) - Dokumentasi lengkap project
+
+## 🔐 Default Admin
+
+Untuk membuat admin, jalankan:
+```bash
+php artisan tinker
+```
+Kemudian:
+```php
+$user = User::where('email', 'your-email@example.com')->first();
+$user->role = 'admin';
+$user->save();
+```
+
+## 📝 License
+
+This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## 👤 Author
+
+**BOY SAHRANSYAH**
+- GitHub: [@boyyy27](https://github.com/boyyy27)
+
+---
+
+**Note**: Project ini adalah portal pembayaran untuk TMS. Untuk akses ke sistem TMS, user harus melakukan pembayaran terlebih dahulu melalui portal ini.
