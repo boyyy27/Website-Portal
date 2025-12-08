@@ -1,11 +1,24 @@
 # Setup Vercel untuk OMILE Portal
 
+## ⚠️ Catatan Penting
+
+**Vercel TIDAK IDEAL untuk Laravel** karena:
+- Vercel fokus pada serverless functions dan static sites
+- Laravel memerlukan full PHP runtime dan persistent storage
+- Vercel tidak support PHP runtime secara native untuk Laravel
+- Storage di Vercel adalah read-only (tidak bisa write ke filesystem)
+
+**Rekomendasi**: Gunakan **Railway** atau **Render** yang lebih cocok untuk Laravel. Lihat [DEPLOYMENT.md](DEPLOYMENT.md) untuk opsi lain.
+
+Jika tetap ingin menggunakan Vercel, ikuti panduan di bawah ini, tapi perlu setup tambahan untuk storage dan beberapa fitur mungkin tidak berfungsi dengan baik.
+
 ## 📋 Prerequisites
 
 Sebelum deploy ke Vercel, pastikan:
 - ✅ Repository sudah di-push ke GitHub
 - ✅ Database sudah di-setup (Vercel tidak menyediakan database, gunakan external database)
 - ✅ Environment variables sudah disiapkan
+- ✅ Storage external sudah di-setup (S3, Cloudinary, dll) untuk file uploads
 
 ## 🚀 Cara Deploy ke Vercel
 
@@ -24,8 +37,10 @@ Sebelum deploy ke Vercel, pastikan:
    - **Framework Preset**: Other
    - **Root Directory**: `./` (default)
    - **Build Command**: `composer install --no-dev --optimize-autoloader`
-   - **Output Directory**: `public` (tidak perlu, karena kita pakai PHP)
+   - **Output Directory**: `public`
    - **Install Command**: (kosongkan)
+   
+   **Catatan**: Vercel mungkin tidak bisa menjalankan Laravel dengan sempurna. Pertimbangkan menggunakan Railway atau Render.
 
 4. **Environment Variables**
    Klik "Environment Variables" dan tambahkan:
