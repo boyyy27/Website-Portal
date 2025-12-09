@@ -14,7 +14,7 @@
 3. Klik tombol **"+ New Variable"** (di kanan atas)
 4. Isi form:
    - **Name**: `RAILPACK_PHP_VERSION`
-   - **Value**: `8.1`
+   - **Value**: `8.2`
 5. Klik **"Add"**
 
 ### Step 2: Pastikan Variable Penting Lainnya Ada
@@ -45,7 +45,7 @@ Tambahkan juga variable-variable ini jika belum ada:
 
 ## 📋 Checklist Variables yang Harus Ada
 
-- [ ] `RAILPACK_PHP_VERSION=8.1` ⭐ **PENTING untuk fix PHP error**
+- [ ] `RAILPACK_PHP_VERSION=8.2` ⭐ **PENTING untuk fix PHP error**
 - [ ] `APP_KEY=base64:...` ⭐ **WAJIB untuk Laravel**
 - [ ] `APP_NAME=OMILE`
 - [ ] `APP_ENV=production`
@@ -65,10 +65,10 @@ Tambahkan juga variable-variable ini jika belum ada:
 
 1. Cek tab **"Build Logs"** untuk detail error
 2. Pastikan semua variable di atas sudah ada
-3. Pastikan `composer.json` sudah diupdate dengan `"php": "^8.1"`
-4. Pastikan file `.php-version` ada dengan isi `8.1`
+3. Pastikan `composer.json` sudah diupdate dengan `"php": "^8.2"`
+4. Pastikan file `.php-version` ada dengan isi `8.2`
 
 ---
 
-**Setelah menambahkan `RAILPACK_PHP_VERSION=8.1`, build seharusnya berhasil!** 🚀
+**Setelah menambahkan `RAILPACK_PHP_VERSION=8.2`, build seharusnya berhasil!** 🚀
 

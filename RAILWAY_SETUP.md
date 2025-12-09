@@ -64,10 +64,10 @@ Railway adalah **platform PALING RECOMMENDED** untuk deploy Laravel karena:
 
 **PENTING - Tambahkan ini DULU untuk fix PHP version:**
 ```
-RAILPACK_PHP_VERSION=8.1
+RAILPACK_PHP_VERSION=8.2
 ```
 
-**Catatan**: File `composer.json` sudah diupdate dengan `"php": "^8.1"` dan file `.php-version` sudah ada dengan `8.1`. Pastikan environment variable `RAILPACK_PHP_VERSION=8.1` sudah di-set di Railway dashboard.
+**Catatan**: File `composer.json` sudah diupdate dengan `"php": "^8.2"` dan file `.php-version` sudah ada dengan `8.2`. Pastikan environment variable `RAILPACK_PHP_VERSION=8.2` sudah di-set di Railway dashboard.
 
 #### A. Application Variables (Wajib)
 
