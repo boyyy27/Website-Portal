@@ -62,6 +62,11 @@ Railway adalah **platform PALING RECOMMENDED** untuk deploy Laravel karena:
 2. Klik tab **"Variables"**
 3. Klik **"New Variable"** dan tambahkan satu per satu:
 
+**PENTING - Tambahkan ini DULU untuk fix PHP version:**
+```
+RAILPACK_PHP_VERSION=8.1
+```
+
 #### A. Application Variables (Wajib)
 
 ```
