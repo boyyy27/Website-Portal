@@ -9,44 +9,71 @@
 
 ## 🚀 Opsi Deployment yang Tersedia
 
-### 1. **Vercel** (Recommended untuk Laravel)
-- ✅ Support PHP dan Laravel
-- ✅ Gratis untuk personal projects
+### 1. **Railway** ⭐ (PALING RECOMMENDED)
+- ✅ Support Laravel + PostgreSQL secara native
+- ✅ Auto-detect Laravel project
+- ✅ Database PostgreSQL included (gratis)
 - ✅ Auto-deploy dari GitHub
 - ✅ Environment variables support
+- ✅ Persistent storage
+- ✅ Gratis $5 credit/bulan
+- ✅ Setup sangat mudah (5 menit!)
+
+**Setup:**
+📖 **Lihat [RAILWAY_SETUP.md](RAILWAY_SETUP.md) untuk panduan lengkap step-by-step**
+
+Quick Start:
+1. Sign up di [railway.app](https://railway.app) (gratis, dengan GitHub)
+2. New Project → Deploy from GitHub
+3. Pilih repository: `boyyy27/Website-Portal`
+4. Railway akan auto-detect Laravel
+5. Add PostgreSQL service (gratis)
+6. Set environment variables (APP_KEY, Midtrans, dll)
+7. Run migrations: `railway run php artisan migrate --force`
+8. Deploy!
+
+**Link akan muncul:** `https://your-project.railway.app`
+
+**Waktu setup:** ~5 menit
+
+---
+
+### 2. **Render** (Gratis Tier Tersedia)
+- ✅ Support Laravel
+- ✅ PostgreSQL support
+- ✅ Auto-deploy dari GitHub
+- ⚠️ Free tier akan sleep setelah 15 menit tidak aktif
+
+**Setup:**
+📖 **Lihat [RENDER_SETUP.md](RENDER_SETUP.md) untuk panduan lengkap step-by-step**
+
+Quick Start:
+1. Sign up di [render.com](https://render.com)
+2. **Buat PostgreSQL database DULU** (penting!)
+3. New → Web Service
+4. Connect GitHub repository
+5. Build command: `composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache && php artisan view:cache`
+6. Start command: `php artisan serve --host=0.0.0.0 --port=$PORT`
+7. Set environment variables (APP_KEY, database, dll)
+8. Deploy
+
+**Link akan muncul:** `https://your-project.onrender.com`
+
+**Catatan**: File `render.yaml` sudah tersedia untuk konfigurasi otomatis (opsional).
+
+---
+
+### 3. **Vercel** (Tidak Ideal untuk Laravel)
+- ⚠️ **TIDAK IDEAL untuk Laravel** - Vercel tidak support full PHP runtime
 - ⚠️ **TIDAK menyediakan database** (perlu external database)
+- ⚠️ Storage read-only (tidak bisa write)
+- ✅ Gratis untuk personal projects
+- ✅ Auto-deploy dari GitHub
 
 **Setup:**
 📖 **Lihat [VERCEL_SETUP.md](VERCEL_SETUP.md) untuk panduan lengkap**
 
-Quick Start:
-1. File `vercel.json` sudah dibuat di project
-2. Sign up di [vercel.com](https://vercel.com)
-3. Import project dari GitHub
-4. Set environment variables
-5. Deploy
-
-**Link akan muncul:** `https://your-project.vercel.app`
-
-**Catatan**: Vercel tidak menyediakan database. Gunakan Supabase, Railway, atau Render untuk database PostgreSQL.
-
----
-
-### 2. **Railway** (Recommended)
-- ✅ Support Laravel + PostgreSQL
-- ✅ Auto-deploy dari GitHub
-- ✅ Database included
-- ✅ Environment variables support
-
-**Setup:**
-1. Sign up di [railway.app](https://railway.app)
-2. New Project → Deploy from GitHub
-3. Pilih repository
-4. Add PostgreSQL service
-5. Set environment variables
-6. Deploy
-
-**Link akan muncul:** `https://your-project.railway.app`
+**Catatan**: Vercel tidak ideal untuk Laravel. **Rekomendasi: Gunakan Railway atau Render!**
 
 ---
 
