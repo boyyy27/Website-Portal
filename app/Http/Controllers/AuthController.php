@@ -103,20 +103,25 @@ class AuthController extends Controller
             ];
 
             // Add optional fields if they exist in database
-            if (\Schema::hasColumn('users', 'role')) {
-                $userData['role'] = 'user';
-            }
-            if (\Schema::hasColumn('users', 'is_active')) {
-                $userData['is_active'] = true;
-            }
-            if (\Schema::hasColumn('users', 'email_verified')) {
-                $userData['email_verified'] = false;
-            }
-            if (\Schema::hasColumn('users', 'verification_token')) {
-                $userData['verification_token'] = $verificationToken;
-            }
-            if (\Schema::hasColumn('users', 'verification_token_expires')) {
-                $userData['verification_token_expires'] = $expiresAt;
+            try {
+                if (Schema::hasColumn('users', 'role')) {
+                    $userData['role'] = 'user';
+                }
+                if (Schema::hasColumn('users', 'is_active')) {
+                    $userData['is_active'] = true;
+                }
+                if (Schema::hasColumn('users', 'email_verified')) {
+                    $userData['email_verified'] = false;
+                }
+                if (Schema::hasColumn('users', 'verification_token')) {
+                    $userData['verification_token'] = $verificationToken;
+                }
+                if (Schema::hasColumn('users', 'verification_token_expires')) {
+                    $userData['verification_token_expires'] = $expiresAt;
+                }
+            } catch (\Exception $schemaError) {
+                \Log::warning('Schema check error (non-fatal): ' . $schemaError->getMessage());
+                // Continue without optional fields - will use defaults if migration not run yet
             }
 
             $user = User::create($userData);
