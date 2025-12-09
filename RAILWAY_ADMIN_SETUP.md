@@ -6,35 +6,9 @@ Setelah migrations berhasil, kita perlu membuat admin user untuk bisa login ke d
 
 ---
 
-## ✅ Opsi 1: Menggunakan Seeder (Recommended)
+## ✅ Opsi 1: Tambahkan ke Deploy Command (PALING MUDAH) ⭐
 
-### Step 1: Run Admin Seeder
-
-Via Railway CLI:
-```bash
-railway run php artisan db:seed --class=AdminSeeder
-```
-
-**Admin credentials default:**
-- **Email**: `admin@omile.id`
-- **Password**: `Admin123!`
-
-⚠️ **PENTING**: Ganti password setelah login pertama kali!
-
-### Step 2: Update DatabaseSeeder (Opsional)
-
-Seeder sudah ditambahkan ke `DatabaseSeeder`, jadi bisa juga run:
-```bash
-railway run php artisan db:seed
-```
-
-Ini akan create admin user dan seed packages.
-
----
-
-## ✅ Opsi 2: Via Deploy Command (Otomatis)
-
-Tambahkan seeder ke Deploy Command di Railway:
+Seeder akan otomatis di-run saat deploy, jadi admin user akan dibuat otomatis!
 
 1. Railway Dashboard → Service **"omile-portal"** → Tab **"Settings"**
 2. Scroll ke **"Deploy Command"**
@@ -42,8 +16,16 @@ Tambahkan seeder ke Deploy Command di Railway:
    ```
    php artisan migrate --force && php artisan db:seed --class=AdminSeeder && php artisan serve --host=0.0.0.0 --port=$PORT
    ```
+4. Klik **"Save"**
+5. Tab **"Deployments"** → **"Redeploy"** → **"Deploy latest commit"**
 
-**Catatan**: Ini akan create admin setiap deploy. Jika admin sudah ada, seeder akan skip (tidak error).
+**Admin credentials default:**
+- **Email**: `admin@omile.id`
+- **Password**: `Admin123!`
+
+⚠️ **PENTING**: 
+- Seeder akan skip jika admin sudah ada (tidak error)
+- Ganti password setelah login pertama kali!
 
 Setelah admin user dibuat, kembalikan start command ke:
 ```
@@ -52,24 +34,45 @@ php artisan serve --host=0.0.0.0 --port=$PORT
 
 ---
 
-## ✅ Opsi 3: Manual via Railway CLI
+## ✅ Opsi 2: Run Seeder Manual di Railway Server
 
-1. Login Railway CLI:
-   ```bash
-   railway login
-   ```
+⚠️ **PENTING**: Command ini harus di-run di Railway server, bukan dari local machine!
 
-2. Link ke project:
+Via Railway CLI:
+```bash
+# Pastikan sudah link ke project
+railway link
+
+# Run seeder di Railway server (bukan local!)
+railway run php artisan db:seed --class=AdminSeeder
+```
+
+**Catatan**: `railway run` akan execute command di Railway server, bukan local machine.
+
+Atau run semua seeders:
+```bash
+railway run php artisan db:seed
+```
+
+Ini akan create admin user dan seed packages.
+
+---
+
+## ✅ Opsi 3: Manual via Railway CLI (Tinker)
+
+⚠️ **PENTING**: Command ini harus di-run di Railway server, bukan dari local machine!
+
+1. Pastikan sudah link ke project:
    ```bash
    railway link
    ```
 
-3. Run tinker:
+2. Run tinker di Railway server:
    ```bash
    railway run php artisan tinker
    ```
 
-4. Di tinker, create admin user:
+3. Di tinker, create admin user:
    ```php
    use App\Models\User;
    use Illuminate\Support\Facades\Hash;
@@ -86,11 +89,11 @@ php artisan serve --host=0.0.0.0 --port=$PORT
    ]);
    ```
 
-5. Type `exit` untuk keluar dari tinker
+4. Type `exit` untuk keluar dari tinker
 
 ---
 
-## ✅ Opsi 4: Via Database Direct (Jika punya akses)
+## ✅ Opsi 4: Via Database Direct (Jika punya akses PostgreSQL)
 
 Jika punya akses langsung ke database Railway:
 
@@ -152,6 +155,8 @@ Setelah login pertama kali, **WAJIB ganti password** untuk keamanan!
 ## 🔍 Verify Admin User
 
 Cek apakah admin user sudah dibuat:
+
+⚠️ **PENTING**: Command ini harus di-run di Railway server!
 
 ```bash
 railway run php artisan tinker
