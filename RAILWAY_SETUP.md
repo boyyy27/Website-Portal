@@ -3,13 +3,15 @@
 ## 🎯 Kenapa Railway?
 
 Railway adalah **platform PALING RECOMMENDED** untuk deploy Laravel karena:
-- ✅ **Auto-detect Laravel** - Railway otomatis mengenali project Laravel
+- ✅ **Auto-detect Laravel** - Railway menggunakan Railpack untuk otomatis mengenali project Laravel
 - ✅ **PostgreSQL included** - Database langsung tersedia
 - ✅ **Auto-deploy dari GitHub** - Setiap push langsung deploy
 - ✅ **Environment variables** - Mudah di-manage
 - ✅ **Persistent storage** - Support file uploads dan sessions
 - ✅ **Gratis $5 credit/bulan** - Cukup untuk testing
 - ✅ **Setup sangat mudah** - Hanya 5 menit!
+
+**Catatan**: File `railway.json` dan `.php-version` sudah dibuat untuk konfigurasi PHP version.
 
 ---
 
@@ -250,9 +252,11 @@ Railway akan **otomatis deploy** setiap kali Anda push ke GitHub!
 3. Pastikan PostgreSQL sudah dibuat dan running
 4. Cek `composer.json` valid
 5. **Jika error "No version available for php"**:
-   - File `nixpacks.toml` dan `.php-version` sudah dibuat di project
-   - Pastikan file sudah di-commit dan push ke GitHub
+   - File `railway.json` dan `.php-version` sudah dibuat di project
+   - File `composer.json` sudah diupdate dengan `config.platform.php`
+   - Pastikan semua file sudah di-commit dan push ke GitHub
    - Redeploy setelah push
+   - Railway menggunakan **Railpack** (bukan Nixpacks) untuk Laravel detection
 
 ---
 
