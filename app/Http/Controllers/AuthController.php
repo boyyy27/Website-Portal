@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -93,32 +94,70 @@ class AuthController extends Controller
         $verificationToken = Str::random(60);
         $expiresAt = now()->addMinutes(15);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'user',
-            'is_active' => true,
-            'email_verified' => false,
-            'verification_token' => $verificationToken,
-            'verification_token_expires' => $expiresAt,
-        ]);
-
-        // Store verification code in session temporarily
-        session(['verification_code_' . $user->id => $verificationCode]);
-        session(['verification_user_id' => $user->id]);
-
-        // Send verification email
         try {
-            Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
-        } catch (\Exception $e) {
-            // Log error but don't fail registration
-            \Log::error('Failed to send verification email: ' . $e->getMessage());
-        }
+            // Prepare user data - only include fields that exist
+            $userData = [
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ];
 
-        // Don't login automatically, redirect to verification page
-        return redirect()->route('verification.show')
-            ->with('success', 'Registrasi berhasil! Silakan verifikasi email Anda dengan kode yang telah dikirim.');
+            // Add optional fields if they exist in database
+            if (\Schema::hasColumn('users', 'role')) {
+                $userData['role'] = 'user';
+            }
+            if (\Schema::hasColumn('users', 'is_active')) {
+                $userData['is_active'] = true;
+            }
+            if (\Schema::hasColumn('users', 'email_verified')) {
+                $userData['email_verified'] = false;
+            }
+            if (\Schema::hasColumn('users', 'verification_token')) {
+                $userData['verification_token'] = $verificationToken;
+            }
+            if (\Schema::hasColumn('users', 'verification_token_expires')) {
+                $userData['verification_token_expires'] = $expiresAt;
+            }
+
+            $user = User::create($userData);
+
+            // Store verification code in session temporarily
+            session(['verification_code_' . $user->id => $verificationCode]);
+            session(['verification_user_id' => $user->id]);
+
+            // Send verification email
+            try {
+                Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
+            } catch (\Exception $e) {
+                // Log error but don't fail registration
+                \Log::error('Failed to send verification email: ' . $e->getMessage());
+            }
+
+            // Don't login automatically, redirect to verification page
+            return redirect()->route('verification.show')
+                ->with('success', 'Registrasi berhasil! Silakan verifikasi email Anda dengan kode yang telah dikirim.');
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Log::error('Registration database error: ' . $e->getMessage());
+            
+            // Check if error is due to missing columns
+            if (str_contains($e->getMessage(), 'column') && str_contains($e->getMessage(), 'does not exist')) {
+                return back()->withErrors([
+                    'email' => 'Database schema belum lengkap. Silakan jalankan migrations terlebih dahulu.',
+                ])->withInput();
+            }
+
+            return back()->withErrors([
+                'email' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi atau hubungi administrator.',
+            ])->withInput();
+
+        } catch (\Exception $e) {
+            \Log::error('Registration error: ' . $e->getMessage());
+            
+            return back()->withErrors([
+                'email' => 'Terjadi kesalahan saat mendaftar. Silakan coba lagi.',
+            ])->withInput();
+        }
     }
 
     /**
