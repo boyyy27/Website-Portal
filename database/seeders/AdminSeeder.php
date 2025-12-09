@@ -15,6 +15,8 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
+        // Skip if already exists and don't prompt in production
+        $this->command->getOutput()->setVerbosity(\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_QUIET);
         // Check if admin already exists
         $adminExists = User::where('email', 'admin@omile.id')->exists();
 

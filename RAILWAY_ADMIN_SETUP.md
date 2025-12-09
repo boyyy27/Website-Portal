@@ -14,8 +14,10 @@ Seeder akan otomatis di-run saat deploy, jadi admin user akan dibuat otomatis!
 2. Scroll ke **"Deploy Command"**
 3. Set sebagai:
    ```
-   php artisan migrate --force && php artisan db:seed --class=AdminSeeder && php artisan serve --host=0.0.0.0 --port=$PORT
+   php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && php artisan serve --host=0.0.0.0 --port=$PORT
    ```
+
+   **PENTING**: Tambahkan flag `--force` pada `db:seed` untuk skip konfirmasi di production!
 4. Klik **"Save"**
 5. Tab **"Deployments"** → **"Redeploy"** → **"Deploy latest commit"**
 

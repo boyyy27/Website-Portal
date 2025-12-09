@@ -18,8 +18,10 @@ Ini terjadi karena Deploy Command memiliki quote yang tidak tertutup atau escapi
 4. **Copy dan paste command ini** (satu baris, tanpa line break):
 
 ```
-php artisan config:clear && php artisan cache:clear && php artisan view:clear && php artisan route:clear && php artisan config:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
+php artisan config:clear && php artisan cache:clear && php artisan view:clear && php artisan route:clear && php artisan config:cache && php artisan migrate --force && php artisan db:seed --class=AdminSeeder --force && php artisan serve --host=0.0.0.0 --port=$PORT
 ```
+
+**Catatan**: Flag `--force` pada `db:seed` diperlukan untuk skip konfirmasi di production.
 
 5. Klik **"Save"**
 6. Tab **"Deployments"** → **"Redeploy"** → **"Deploy latest commit"**
