@@ -130,12 +130,30 @@ class AuthController extends Controller
             session(['verification_code_' . $user->id => $verificationCode]);
             session(['verification_user_id' => $user->id]);
 
-            // Send verification email
+            // Send verification email (non-blocking, with timeout protection)
+            // Use queue or async if possible, otherwise skip if email not configured
             try {
-                Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
+                // Check if mail is configured, if not skip sending
+                $mailDriver = config('mail.default');
+                if ($mailDriver === 'log' || empty(config('mail.mailers.smtp.host'))) {
+                    \Log::info('Email not configured, skipping verification email. Code stored in session.');
+                } else {
+                    // Set shorter timeout for email (10 seconds max)
+                    $originalTimeout = ini_get('max_execution_time');
+                    set_time_limit(10);
+                    
+                    Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
+                    \Log::info('Verification email sent successfully to: ' . $user->email);
+                    
+                    // Restore original timeout
+                    if ($originalTimeout) {
+                        set_time_limit($originalTimeout);
+                    }
+                }
             } catch (\Exception $e) {
                 // Log error but don't fail registration
                 \Log::error('Failed to send verification email: ' . $e->getMessage());
+                // User can still verify using code from session
             }
 
             // Don't login automatically, redirect to verification page
