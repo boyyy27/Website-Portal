@@ -130,30 +130,45 @@ class AuthController extends Controller
             session(['verification_code_' . $user->id => $verificationCode]);
             session(['verification_user_id' => $user->id]);
 
-            // Send verification email (non-blocking, with timeout protection)
-            // Use queue or async if possible, otherwise skip if email not configured
+            // Send verification email (always send in production, use queue if available)
             try {
-                // Check if mail is configured, if not skip sending
-                $mailDriver = config('mail.default');
-                if ($mailDriver === 'log' || empty(config('mail.mailers.smtp.host'))) {
-                    \Log::info('Email not configured, skipping verification email. Code stored in session.');
+                // Check if queue is available, use it to prevent timeout
+                $queueConnection = config('queue.default');
+                
+                if ($queueConnection !== 'sync') {
+                    // Use queue for async email sending (recommended for production)
+                    Mail::to($user->email)->queue(new VerificationCodeMail($verificationCode, $user->name));
+                    \Log::info('Verification email queued successfully for: ' . $user->email);
                 } else {
-                    // Set shorter timeout for email (10 seconds max)
+                    // Queue not available, send synchronously with timeout protection
                     $originalTimeout = ini_get('max_execution_time');
-                    set_time_limit(10);
                     
+                    // Set timeout lebih panjang untuk email (25 seconds)
+                    // Railway biasanya punya timeout 30s, jadi kita set ke 25s untuk safety margin
+                    set_time_limit(25);
+                    
+                    // Send email synchronously
                     Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
                     \Log::info('Verification email sent successfully to: ' . $user->email);
                     
                     // Restore original timeout
                     if ($originalTimeout) {
                         set_time_limit($originalTimeout);
+                    } else {
+                        set_time_limit(30); // Default Railway timeout
                     }
                 }
+                
+            } catch (\Illuminate\Mail\TransportException $e) {
+                // SMTP connection error - log but don't fail registration
+                \Log::error('SMTP connection failed: ' . $e->getMessage());
+                \Log::info('Verification code stored in session. User can verify manually. Code: ' . $verificationCode);
+                // Registration continues - user can verify using code from session
             } catch (\Exception $e) {
-                // Log error but don't fail registration
+                // Any other email error - log but don't fail registration
                 \Log::error('Failed to send verification email: ' . $e->getMessage());
-                // User can still verify using code from session
+                \Log::info('Verification code stored in session. User can verify manually. Code: ' . $verificationCode);
+                // Registration continues - user can verify using code from session
             }
 
             // Don't login automatically, redirect to verification page
