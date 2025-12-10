@@ -133,12 +133,18 @@ class AuthController extends Controller
             // Send verification email (always send in production, use queue if available)
             try {
                 // Check if queue is available, use it to prevent timeout
-                $queueConnection = config('queue.default');
+                $queueConnection = config('queue.default', 'sync');
                 
-                if ($queueConnection !== 'sync') {
+                if ($queueConnection !== 'sync' && class_exists(\Illuminate\Contracts\Queue\ShouldQueue::class)) {
                     // Use queue for async email sending (recommended for production)
-                    Mail::to($user->email)->queue(new VerificationCodeMail($verificationCode, $user->name));
-                    \Log::info('Verification email queued successfully for: ' . $user->email);
+                    try {
+                        Mail::to($user->email)->queue(new VerificationCodeMail($verificationCode, $user->name));
+                        \Log::info('Verification email queued successfully for: ' . $user->email);
+                    } catch (\Exception $queueError) {
+                        // Queue failed, fallback to sync
+                        \Log::warning('Queue failed, falling back to sync: ' . $queueError->getMessage());
+                        throw $queueError; // Will be caught by outer catch
+                    }
                 } else {
                     // Queue not available, send synchronously with timeout protection
                     $originalTimeout = ini_get('max_execution_time');
@@ -167,6 +173,7 @@ class AuthController extends Controller
             } catch (\Exception $e) {
                 // Any other email error - log but don't fail registration
                 \Log::error('Failed to send verification email: ' . $e->getMessage());
+                \Log::error('Email error stack trace: ' . $e->getTraceAsString());
                 \Log::info('Verification code stored in session. User can verify manually. Code: ' . $verificationCode);
                 // Registration continues - user can verify using code from session
             }
