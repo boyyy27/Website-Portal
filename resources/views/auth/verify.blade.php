@@ -341,6 +341,25 @@
                 
                 <h1 class="auth-title">Verifikasi Email Anda</h1>
                 <p class="auth-subtitle">Kami telah mengirimkan kode verifikasi 6 digit ke email Anda. Silakan masukkan kode tersebut di bawah ini.</p>
+                
+                @php
+                    $verificationCode = session('verification_code_' . $user->id);
+                @endphp
+                
+                @if(!$verificationCode)
+                    <div class="alert alert-danger">
+                        <i class="mdi mdi-alert-circle me-2"></i>
+                        Sesi verifikasi tidak ditemukan. Silakan daftar ulang.
+                    </div>
+                @elseif(!session('email_sent_' . $user->id))
+                    <div class="info-box">
+                        <p>
+                            <i class="mdi mdi-information icon"></i>
+                            <strong>Email tidak terkirim.</strong> Silakan gunakan kode verifikasi berikut: 
+                            <strong style="font-size: 1.2rem; color: #f58905;">{{ $verificationCode }}</strong>
+                        </p>
+                    </div>
+                @endif
 
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">

@@ -130,8 +130,8 @@ class AuthController extends Controller
             session(['verification_code_' . $user->id => $verificationCode]);
             session(['verification_user_id' => $user->id]);
 
-            // Send verification email (completely non-blocking to prevent registration failure)
-            // If email fails, auto-verify user so they can login immediately
+            // Send verification email (non-blocking to prevent registration failure)
+            // Email is required for verification, but registration should not fail if email timeout
             $emailSent = false;
             
             try {
@@ -149,10 +149,12 @@ class AuthController extends Controller
                     try {
                         Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
                         $emailSent = true;
+                        session(['email_sent_' . $user->id => true]);
                         \Log::info('Verification email sent successfully to: ' . $user->email);
                     } catch (\Exception $emailException) {
-                        // Email failed - will auto-verify below
+                        // Email failed - code still in session, user can verify manually
                         \Log::warning('Email sending failed: ' . $emailException->getMessage());
+                        \Log::info('Verification code stored in session. Code: ' . $verificationCode . ' - User can verify manually.');
                     }
                     
                     // Restore timeout immediately
@@ -160,29 +162,16 @@ class AuthController extends Controller
                         @set_time_limit($originalTimeout);
                     }
                 } else {
-                    \Log::warning('Email not configured. Auto-verifying user.');
+                    \Log::warning('Email not configured. Verification code stored in session. Code: ' . $verificationCode);
                 }
             } catch (\Exception $e) {
-                // Any email error - log but continue
+                // Any email error - log but continue, code still in session
                 \Log::warning('Email error: ' . $e->getMessage());
+                \Log::info('Verification code stored in session. Code: ' . $verificationCode . ' - User can verify manually.');
             }
             
-            // If email not sent, auto-verify user so they can login
-            if (!$emailSent) {
-                $user->update([
-                    'email_verified' => true,
-                    'verified_at' => now(),
-                ]);
-                \Log::info('User auto-verified due to email failure. User can login immediately.');
-                
-                // Auto login user
-                Auth::login($user);
-                
-                return redirect()->route('dashboard')
-                    ->with('success', 'Registrasi berhasil! Akun Anda telah aktif. (Email verifikasi dilewati karena email tidak terkirim)');
-            }
-            
-            // Email sent successfully - redirect to verification page
+            // Always redirect to verification page (user must verify)
+            // Code is stored in session, user can input manually if email not sent
             \Log::info('Verification code stored in session. Code: ' . $verificationCode);
 
             // Don't login automatically, redirect to verification page
