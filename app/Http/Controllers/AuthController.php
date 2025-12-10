@@ -130,37 +130,49 @@ class AuthController extends Controller
             session(['verification_code_' . $user->id => $verificationCode]);
             session(['verification_user_id' => $user->id]);
 
-            // Send verification email (non-blocking to prevent timeout)
-            // Use shorter timeout and don't block registration
+            // Send verification email (non-blocking, with timeout protection)
+            // Use background process or skip if timeout to prevent registration failure
             try {
-                // Set shorter timeout untuk email (5 seconds max)
-                // Jika timeout, registration tetap berhasil
-                $originalTimeout = ini_get('max_execution_time');
-                set_time_limit(5);
+                // Check if mail is configured
+                $mailHost = config('mail.mailers.smtp.host');
+                $mailUsername = config('mail.mailers.smtp.username');
+                $mailPassword = config('mail.mailers.smtp.password');
                 
-                // Try to send email with short timeout
-                Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
-                \Log::info('Verification email sent successfully to: ' . $user->email);
-                
-                // Restore original timeout
-                if ($originalTimeout) {
-                    set_time_limit($originalTimeout);
+                if (empty($mailHost) || empty($mailUsername) || empty($mailPassword)) {
+                    \Log::warning('Email not configured properly. Host: ' . ($mailHost ?: 'empty') . ', Username: ' . ($mailUsername ?: 'empty'));
+                    \Log::info('Verification code stored in session. Code: ' . $verificationCode);
+                } else {
+                    // Set timeout untuk email (3 seconds - short timeout to prevent blocking)
+                    // If timeout, registration continues anyway
+                    $originalTimeout = ini_get('max_execution_time');
+                    set_time_limit(3);
+                    
+                    // Try to send email with short timeout
+                    // If it takes longer than 3 seconds, it will timeout but registration continues
+                    try {
+                        Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
+                        \Log::info('Verification email sent successfully to: ' . $user->email);
+                    } catch (\Exception $emailException) {
+                        // Email failed but don't throw - registration continues
+                        \Log::warning('Email sending failed (non-critical): ' . $emailException->getMessage());
+                        \Log::info('Verification code stored in session. Code: ' . $verificationCode);
+                    }
+                    
+                    // Restore original timeout immediately
+                    if ($originalTimeout) {
+                        set_time_limit($originalTimeout);
+                    }
                 }
                 
-            } catch (\Illuminate\Mail\TransportException $e) {
-                // SMTP connection error - log but don't fail registration
-                \Log::error('SMTP connection failed (non-critical): ' . $e->getMessage());
-                \Log::info('Verification code stored in session. Code: ' . $verificationCode);
-                // Registration continues - user can verify using code from session
             } catch (\Exception $e) {
-                // Any other email error (including timeout) - log but don't fail registration
-                \Log::error('Failed to send verification email (non-critical): ' . $e->getMessage());
+                // Any email error (including timeout) - log but don't fail registration
+                \Log::error('Email error (non-critical): ' . $e->getMessage());
                 \Log::info('Verification code stored in session. Code: ' . $verificationCode);
                 // Registration continues - user can verify using code from session
             } finally {
-                // Always restore timeout
+                // Always restore timeout to prevent affecting other operations
                 if (isset($originalTimeout)) {
-                    set_time_limit($originalTimeout);
+                    @set_time_limit($originalTimeout);
                 }
             }
 
