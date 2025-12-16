@@ -339,23 +339,36 @@
                     <i class="mdi mdi-email-check"></i>
                 </div>
                 
-                <h1 class="auth-title">Verifikasi Email Anda</h1>
-                <p class="auth-subtitle">Kami telah mengirimkan kode verifikasi 6 digit ke email Anda. Silakan masukkan kode tersebut di bawah ini.</p>
-                
                 @php
                     $verificationCode = session('verification_code_' . $user->id);
+                    $emailSent = session('email_sent_' . $user->id);
                 @endphp
+
+                <h1 class="auth-title">Verifikasi Email Anda</h1>
                 
                 @if(!$verificationCode)
+                    <p class="auth-subtitle">
+                        Sesi verifikasi tidak ditemukan atau sudah kedaluwarsa. 
+                        Silakan lakukan pendaftaran ulang untuk mendapatkan kode verifikasi baru.
+                    </p>
                     <div class="alert alert-danger">
                         <i class="mdi mdi-alert-circle me-2"></i>
                         Sesi verifikasi tidak ditemukan. Silakan daftar ulang.
                     </div>
-                @elseif(!session('email_sent_' . $user->id))
+                @elseif($emailSent)
+                    <p class="auth-subtitle">
+                        Kami telah mengirimkan kode verifikasi 6 digit ke email Anda. 
+                        Silakan cek folder Inbox <strong>dan Spam/Promotions</strong>, lalu masukkan kode tersebut di bawah ini.
+                    </p>
+                @else
+                    <p class="auth-subtitle">
+                        Kode verifikasi 6 digit untuk akun Anda sudah dibuat. 
+                        Karena email tidak terkirim, silakan gunakan <strong>kode yang ditampilkan di bawah ini</strong> untuk verifikasi.
+                    </p>
                     <div class="info-box">
                         <p>
                             <i class="mdi mdi-information icon"></i>
-                            <strong>Email tidak terkirim.</strong> Silakan gunakan kode verifikasi berikut: 
+                            <strong>Email tidak terkirim.</strong> Gunakan kode verifikasi berikut untuk melanjutkan: 
                             <strong style="font-size: 1.2rem; color: #f58905;">{{ $verificationCode }}</strong>
                         </p>
                     </div>
