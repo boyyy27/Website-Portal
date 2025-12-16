@@ -15,15 +15,18 @@
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Open Sans', sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             background: linear-gradient(135deg, #2f55d4 0%, #f58905 100%);
+            min-height: 100vh;
         }
         .auth-wrapper {
             display: flex;
             min-height: 100vh;
         }
         .auth-left {
-            width: 50%;
+            flex: 1;
+            max-width: 600px;
             background: #fff;
             display: flex;
             flex-direction: column;
@@ -33,7 +36,7 @@
             position: relative;
         }
         .auth-right {
-            width: 50%;
+            flex: 1;
             position: relative;
             overflow: hidden;
         }
@@ -246,6 +249,8 @@
             color: #fff;
             font-size: 0.85rem;
             z-index: 10;
+            padding: 0 16px;
+            white-space: nowrap;
         }
         .auth-footer .powered-by {
             color: #f58905;
@@ -302,30 +307,51 @@
             color: #ff6b35;
             text-decoration: underline;
         }
-        @media (max-width: 768px) {
+        /* Responsive layout */
+        @media (max-width: 992px) {
             .auth-wrapper {
                 flex-direction: column;
             }
             .auth-left,
             .auth-right {
                 width: 100%;
-            }
-            .auth-right {
-                min-height: 300px;
+                max-width: 100%;
             }
             .auth-left {
-                padding: 40px 30px;
+                padding: 32px 20px 40px;
+                min-height: auto;
             }
-            .code-inputs {
-                gap: 8px;
+            .auth-right {
+                order: -1;
+                min-height: 260px;
             }
-            .code-input {
-                width: 50px;
-                height: 60px;
-                font-size: 28px;
+            .auth-footer {
+                position: static;
+                margin-top: 16px;
+                transform: none;
+                left: auto;
+            }
+        }
+        @media (max-width: 576px) {
+            .auth-wrapper {
+                flex-direction: column;
+            }
+            .auth-left {
+                padding: 24px 16px 32px;
+            }
+            .auth-right {
+                display: none; /* Sembunyikan carousel di layar sangat kecil agar fokus ke form */
             }
             .auth-title {
-                font-size: 2rem;
+                font-size: 1.8rem;
+            }
+            .code-inputs {
+                gap: 6px;
+            }
+            .code-input {
+                width: 44px;
+                height: 56px;
+                font-size: 24px;
             }
         }
     </style>
