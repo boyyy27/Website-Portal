@@ -28,5 +28,10 @@ class AppServiceProvider extends ServiceProvider
         if (env('APP_ENV') === 'production' || env('FORCE_HTTPS', false)) {
             \URL::forceScheme('https');
         }
+
+        // Register Resend Mail Transport
+        $this->app->make('mail.manager')->extend('resend', function ($app) {
+            return new \App\Mail\ResendTransport();
+        });
     }
 }
