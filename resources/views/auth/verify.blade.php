@@ -367,7 +367,6 @@
                 
                 @php
                     $verificationCode = session('verification_code_' . $user->id);
-                    $emailSent = session('email_sent_' . $user->id);
                 @endphp
 
                 <h1 class="auth-title">Verifikasi Email Anda</h1>
@@ -381,21 +380,16 @@
                         <i class="mdi mdi-alert-circle me-2"></i>
                         Sesi verifikasi tidak ditemukan. Silakan daftar ulang.
                     </div>
-                @elseif($emailSent)
-                    <p class="auth-subtitle">
-                        Kami telah mengirimkan kode verifikasi 6 digit ke email Anda. 
-                        Silakan cek folder Inbox <strong>dan Spam/Promotions</strong>, lalu masukkan kode tersebut di bawah ini.
-                    </p>
                 @else
                     <p class="auth-subtitle">
-                        Kode verifikasi 6 digit untuk akun Anda sudah dibuat. 
-                        Karena email tidak terkirim, silakan gunakan <strong>kode yang ditampilkan di bawah ini</strong> untuk verifikasi.
+                        Kami telah mengirimkan kode verifikasi 6 digit ke email Anda. 
+                        Silakan cek folder <strong>Inbox dan Spam/Promotions</strong>, lalu masukkan kode tersebut di bawah ini.
                     </p>
                     <div class="info-box">
                         <p>
                             <i class="mdi mdi-information icon"></i>
-                            <strong>Email tidak terkirim.</strong> Gunakan kode verifikasi berikut untuk melanjutkan: 
-                            <strong style="font-size: 1.2rem; color: #f58905;">{{ $verificationCode }}</strong>
+                            <strong>Catatan:</strong> Email mungkin membutuhkan waktu beberapa menit untuk sampai. 
+                            Jika tidak menerima email, klik tombol "Kirim Ulang Kode" di bawah.
                         </p>
                     </div>
                 @endif

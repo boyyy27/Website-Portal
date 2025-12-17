@@ -133,6 +133,7 @@ class AuthController extends Controller
 
             // Kirim email verifikasi menggunakan Queue (background job)
             // Ini akan mencegah timeout karena email dikirim di background
+            $emailSent = false;
             try {
                 // Check if mail is configured
                 $mailHost = config('mail.mailers.smtp.host');
@@ -143,23 +144,19 @@ class AuthController extends Controller
                     // Dispatch email job ke queue (akan diproses di background)
                     SendVerificationEmail::dispatch($user->email, $verificationCode, $user->name, $user->id);
                     
-                    \Log::info('Verification email job dispatched to queue for: ' . $user->email . ' (Code: ' . $verificationCode . ')');
+                    \Log::info('Verification email job dispatched to queue for: ' . $user->email);
+                    $emailSent = true;
+                    session(['email_sent_' . $user->id => true]);
                 } else {
-                    \Log::warning('Email not configured. Verification code stored in session. Code: ' . $verificationCode);
+                    \Log::warning('Email not configured properly.');
                 }
             } catch (\Exception $e) {
-                // Error apapun di proses email tidak boleh menggagalkan registrasi
                 \Log::warning('Email dispatch error: ' . $e->getMessage());
-                \Log::info('Verification code stored in session. Code: ' . $verificationCode . ' - User can verify manually.');
             }
             
-            // Always redirect to verification page (user must verify)
-            // Code is stored in session, user can input manually if email not sent
-            \Log::info('User registered successfully. Verification code: ' . $verificationCode);
-
-            // Don't login automatically, redirect to verification page
+            // Redirect to verification page
             return redirect()->route('verification.show')
-                ->with('success', 'Registrasi berhasil! Silakan verifikasi email Anda dengan kode yang telah dikirim.');
+                ->with('success', 'Registrasi berhasil! Kode verifikasi telah dikirim ke email Anda. Silakan cek folder Inbox dan Spam.');
 
         } catch (\Illuminate\Database\QueryException $e) {
             \Log::error('Registration database error: ' . $e->getMessage());
