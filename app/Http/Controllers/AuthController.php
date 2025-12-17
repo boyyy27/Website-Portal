@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendVerificationEmail;
 use App\Mail\VerificationCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -130,56 +131,31 @@ class AuthController extends Controller
             session(['verification_code_' . $user->id => $verificationCode]);
             session(['verification_user_id' => $user->id]);
 
-            // Kirim email verifikasi (dibuat aman agar TIDAK menyebabkan timeout 500 di production)
-            // Di production Railway kita utamakan agar registrasi cepat dan tidak timeout.
-            $emailSent = false;
-            $env = app()->environment();
-            
+            // Kirim email verifikasi menggunakan Queue (background job)
+            // Ini akan mencegah timeout karena email dikirim di background
             try {
-                // Hanya kirim email secara langsung di environment local saja
-                // Di production, kita TIDAK mengirim email langsung untuk menghindari timeout jaringan SMTP.
-                if ($env === 'local') {
-                    // Check if mail is configured
-                    $mailHost = config('mail.mailers.smtp.host');
-                    $mailUsername = config('mail.mailers.smtp.username');
-                    $mailPassword = config('mail.mailers.smtp.password');
+                // Check if mail is configured
+                $mailHost = config('mail.mailers.smtp.host');
+                $mailUsername = config('mail.mailers.smtp.username');
+                $mailPassword = config('mail.mailers.smtp.password');
 
-                    if (!empty($mailHost) && !empty($mailUsername) && !empty($mailPassword)) {
-                        // Set very short timeout untuk email (2 seconds max)
-                        $originalTimeout = ini_get('max_execution_time');
-                        @set_time_limit(2);
-                        
-                        try {
-                            Mail::to($user->email)->send(new VerificationCodeMail($verificationCode, $user->name));
-                            $emailSent = true;
-                            session(['email_sent_' . $user->id => true]);
-                            \Log::info('Verification email sent successfully to: ' . $user->email);
-                        } catch (\Exception $emailException) {
-                            // Email failed - code still in session, user bisa verifikasi manual
-                            \Log::warning('Email sending failed (local): ' . $emailException->getMessage());
-                            \Log::info('Verification code stored in session. Code: ' . $verificationCode . ' - User can verify manually.');
-                        }
-                        
-                        // Restore timeout immediately
-                        if ($originalTimeout) {
-                            @set_time_limit($originalTimeout);
-                        }
-                    } else {
-                        \Log::warning('Email not configured in local. Verification code stored in session. Code: ' . $verificationCode);
-                    }
+                if (!empty($mailHost) && !empty($mailUsername) && !empty($mailPassword)) {
+                    // Dispatch email job ke queue (akan diproses di background)
+                    SendVerificationEmail::dispatch($user->email, $verificationCode, $user->name, $user->id);
+                    
+                    \Log::info('Verification email job dispatched to queue for: ' . $user->email . ' (Code: ' . $verificationCode . ')');
                 } else {
-                    // PRODUCTION (Railway) → TIDAK kirim email langsung untuk menghindari timeout 25–30 detik
-                    \Log::info('Skip direct email sending in production. Verification code stored in session. Code: ' . $verificationCode);
+                    \Log::warning('Email not configured. Verification code stored in session. Code: ' . $verificationCode);
                 }
             } catch (\Exception $e) {
                 // Error apapun di proses email tidak boleh menggagalkan registrasi
-                \Log::warning('Email process error: ' . $e->getMessage());
+                \Log::warning('Email dispatch error: ' . $e->getMessage());
                 \Log::info('Verification code stored in session. Code: ' . $verificationCode . ' - User can verify manually.');
             }
             
             // Always redirect to verification page (user must verify)
             // Code is stored in session, user can input manually if email not sent
-            \Log::info('Verification code stored in session. Code: ' . $verificationCode);
+            \Log::info('User registered successfully. Verification code: ' . $verificationCode);
 
             // Don't login automatically, redirect to verification page
             return redirect()->route('verification.show')
