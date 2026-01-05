@@ -1,0 +1,42 @@
+/* Alert Animations */
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+.alert {
+    animation: slideInDown 0.3s ease-out;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+.alert.alert-dismissible {
+    position: relative;
+    padding-right: 3rem;
+}
+
+/* Smooth fade out when closing */
+.alert.fade-out {
+    animation: fadeOut 0.5s ease-out forwards;
+}
+
+/* Prevent auto-close for specific alerts */
+.alert.alert-permanent {
+    /* This alert will not auto-close */
+}

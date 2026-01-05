@@ -87,15 +87,20 @@ class VerificationController extends Controller
             'verification_token_expires' => null,
         ]);
 
-        // Clear session
+        // Clear session verification data
         session()->forget('verification_code_' . $user->id);
         session()->forget('verification_user_id');
 
-        // Auto login
-        Auth::login($user);
+        // Pastikan user tidak auto-login (logout jika sudah login)
+        if (Auth::check() && Auth::id() === $user->id) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
-        return redirect()->route('dashboard')
-            ->with('success', 'Email berhasil diverifikasi! Selamat datang di OMILE.');
+        // Redirect ke login page (tidak auto login)
+        return redirect()->route('login')
+            ->with('success', 'Email berhasil diverifikasi! Silakan login untuk melanjutkan.');
     }
 
     /**

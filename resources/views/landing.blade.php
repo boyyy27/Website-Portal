@@ -627,7 +627,7 @@
                                         @auth
                                             <a href="{{ route('payment.checkout', $package->id) }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Beli Sekarang</a>
                                         @else
-                                            <a href="{{ route('login') }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Get Started</a>
+                                            <a href="{{ route('register') }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Get Started</a>
                                         @endauth
                                     @endif
                                 </div>

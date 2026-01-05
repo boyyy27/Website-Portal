@@ -115,7 +115,6 @@
             statusMessage.className = 'status-message ' + type;
         }
 
-        // Function untuk membuka dashboard TMS
         function openTmsDashboard() {
             if (dashboardOpened) return;
             
@@ -130,7 +129,7 @@
                     // Setelah 2 detik, tutup halaman redirect ini (optional)
                     setTimeout(() => {
                         // Bisa tutup window ini atau biarkan terbuka
-                        // window.close(); // Uncomment jika ingin auto-close
+                        window.close(); // Uncomment jika ingin auto-close
                     }, 2000);
                 } else {
                     // Popup blocked

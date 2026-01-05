@@ -6,6 +6,7 @@
     <title>Dashboard - OMILE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="{{ asset('css/alert-animations.css') }}">
     <style>
         body {
             background: #f8f9fa;
@@ -65,6 +66,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/alert-auto-close.js') }}"></script>
 </body>
 </html>
 
