@@ -41,7 +41,11 @@
             <button onclick="window.print()" class="btn btn-primary me-2">
                 <i class="mdi mdi-printer"></i> Print
             </button>
-            <a href="{{ route('user.dashboard') }}" class="btn btn-secondary">Kembali</a>
+            @if(Auth::user()->isAdmin())
+                <a href="{{ route('admin.transactions') }}" class="btn btn-secondary">Kembali</a>
+            @else
+                <a href="{{ route('user.dashboard') }}" class="btn btn-secondary">Kembali</a>
+            @endif
         </div>
 
         <div class="invoice-container">
