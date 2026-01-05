@@ -45,6 +45,11 @@ return [
             'auth_mode' => null,
         ],
 
+        'brevo' => [
+            'transport' => 'brevo',
+            'api_key' => env('BREVO_API_KEY'),
+        ],
+
         'ses' => [
             'transport' => 'ses',
         ],
@@ -55,10 +60,6 @@ return [
 
         'postmark' => [
             'transport' => 'postmark',
-        ],
-
-        'resend' => [
-            'transport' => 'resend',
         ],
 
         'sendmail' => [

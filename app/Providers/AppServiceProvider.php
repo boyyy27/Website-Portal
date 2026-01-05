@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\Transports\BrevoTransport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,9 +31,11 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
 
-        // Register Resend Mail Transport
-        $this->app->make('mail.manager')->extend('resend', function ($app) {
-            return new \App\Mail\ResendTransport();
-        });
+        // Register Brevo API transport if API key is set
+        if (config('mail.mailers.brevo.api_key')) {
+            Mail::extend('brevo', function (array $config) {
+                return new BrevoTransport($config['api_key']);
+            });
+        }
     }
 }

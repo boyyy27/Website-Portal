@@ -162,35 +162,7 @@
             <div class="card-body">
                 <p class="text-muted mb-4">
                     Setelah pembayaran berhasil, Anda dapat mengakses sistem TMS untuk mengelola distribusi dan logistik Anda.
-                </p>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3">
-                            <h6 class="mb-3">
-                                <i class="mdi mdi-information-outline me-2 text-primary"></i>
-                                Informasi Login
-                            </h6>
-                            <div class="mb-2">
-                                <strong>URL:</strong>
-                                <div class="mt-1">
-                                    <code class="bg-light p-2 rounded d-block">https://tms.omile.id/demo/dashboard</code>
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <strong>Username:</strong>
-                                <div class="mt-1">
-                                    <code class="bg-light p-2 rounded d-block">DEVODI</code>
-                                </div>
-                            </div>
-                            <div class="mb-2">
-                                <strong>Password:</strong>
-                                <div class="mt-1">
-                                    <code class="bg-light p-2 rounded d-block">XRandom20</code>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </p> 
                     <div class="col-md-6 mb-3">
                         <div class="border rounded p-3 h-100 d-flex flex-column justify-content-center">
                             <h6 class="mb-3">
@@ -210,7 +182,7 @@
                             </small>
                         </div>
                     </div>
-                </div>
+            
 
                 <div class="alert alert-info mt-3 mb-0">
                     <i class="mdi mdi-lightbulb-on me-2"></i>
