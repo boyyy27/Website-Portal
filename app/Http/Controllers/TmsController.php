@@ -26,11 +26,11 @@ class TmsController extends Controller
         }
         
         // TMS credentials (bisa diubah ke config atau database)
-        $tmsUrl = 'https://tms.omile.id/demo/dashboard';
+        $tmsDashboardUrl = 'https://tms.omile.id/demo/dashboard';
         $tmsUsername = 'DEVODI';
         $tmsPassword = 'XRandom20';
         
-        return view('tms.redirect', compact('tmsUrl', 'tmsUsername', 'tmsPassword'));
+        return view('tms.redirect', compact('tmsDashboardUrl', 'tmsUsername', 'tmsPassword'));
     }
 }
 

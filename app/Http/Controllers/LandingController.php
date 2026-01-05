@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
+use App\Models\UserPackage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LandingController extends Controller
 {
@@ -17,7 +19,16 @@ class LandingController extends Controller
             ->orderBy('price', 'asc')
             ->get();
 
-        return view('landing', compact('packages'));
+        // Check if authenticated user has active subscription
+        $hasActiveSubscription = false;
+        if (Auth::check()) {
+            $hasActiveSubscription = UserPackage::where('user_id', Auth::id())
+                ->where('is_active', true)
+                ->where('end_date', '>', now())
+                ->exists();
+        }
+
+        return view('landing', compact('packages', 'hasActiveSubscription'));
     }
 }
 

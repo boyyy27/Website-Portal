@@ -625,7 +625,14 @@
                                         <a href="mailto:marketing@odisys.id" class="btn btn-outline-primary btn-rounded">Contact Sales</a>
                                     @else
                                         @auth
-                                            <a href="{{ route('payment.checkout', $package->id) }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Beli Sekarang</a>
+                                            @if($hasActiveSubscription)
+                                                <button class="btn btn-secondary btn-rounded" disabled>
+                                                    <i class="mdi mdi-check-circle me-2"></i> Sudah Berlangganan
+                                                </button>
+                                                <small class="d-block mt-2 text-muted">Anda sudah memiliki paket aktif</small>
+                                            @else
+                                                <a href="{{ route('payment.checkout', $package->id) }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Beli Sekarang</a>
+                                            @endif
                                         @else
                                             <a href="{{ route('register') }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Get Started</a>
                                         @endauth
