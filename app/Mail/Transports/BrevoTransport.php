@@ -71,53 +71,58 @@ class BrevoTransport implements Swift_Transport
         // Get recipients
         $to = [];
         foreach ((array) $message->getTo() as $email => $name) {
-            $to[] = [
-                'email' => $email,
-                'name' => $name ?: '',
-            ];
+            $recipient = ['email' => $email];
+            if (!empty($name)) {
+                $recipient['name'] = $name;
+            }
+            $to[] = $recipient;
         }
 
         // Get CC recipients
         $cc = [];
         foreach ((array) $message->getCc() as $email => $name) {
-            $cc[] = [
-                'email' => $email,
-                'name' => $name ?: '',
-            ];
+            $recipient = ['email' => $email];
+            if (!empty($name)) {
+                $recipient['name'] = $name;
+            }
+            $cc[] = $recipient;
         }
 
         // Get BCC recipients
         $bcc = [];
         foreach ((array) $message->getBcc() as $email => $name) {
-            $bcc[] = [
-                'email' => $email,
-                'name' => $name ?: '',
-            ];
+            $recipient = ['email' => $email];
+            if (!empty($name)) {
+                $recipient['name'] = $name;
+            }
+            $bcc[] = $recipient;
         }
 
         // Get sender
         $from = $message->getFrom();
         $fromEmail = key($from);
-        $fromName = $from[$fromEmail] ?: '';
+        $fromName = $from[$fromEmail] ?? '';
+
+        $sender = ['email' => $fromEmail];
+        if (!empty($fromName)) {
+            $sender['name'] = $fromName;
+        }
 
         // Get reply-to
         $replyTo = [];
         if ($message->getReplyTo()) {
             foreach ((array) $message->getReplyTo() as $email => $name) {
-                $replyTo = [
-                    'email' => $email,
-                    'name' => $name ?: '',
-                ];
+                $replyTo = ['email' => $email];
+                if (!empty($name)) {
+                    $replyTo['name'] = $name;
+                }
                 break; // Brevo only supports one reply-to
             }
         }
 
         // Prepare payload
         $payload = [
-            'sender' => [
-                'email' => $fromEmail,
-                'name' => $fromName,
-            ],
+            'sender' => $sender,
             'to' => $to,
             'subject' => $message->getSubject(),
         ];
