@@ -173,9 +173,9 @@
         <!-- Active Subscription Card -->
         @if($activeSubscription)
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white"style="background: linear-gradient(135deg, var(--primary) 0%, #f58905 100%);">
                     <div>
-                        <h5 class="card-title mb-0">
+                        <h5 class="card-title mb-0 text-white">
                             <i class="mdi mdi-crown me-2"></i>
                             Langganan Aktif
                         </h5>
@@ -211,9 +211,9 @@
 
             <!-- TMS Access Section -->
             <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-primary text-white" style="background: linear-gradient(135deg, var(--primary) 0%, #f58905 100%);">
                     <div>
-                        <h5 class="card-title mb-0">
+                        <h5 class="card-title mb-0" style="color: white;">
                             <i class="mdi mdi-web me-2"></i>
                             Akses TMS
                         </h5>
@@ -236,7 +236,7 @@
                     <i class="mdi mdi-alert-circle text-warning" style="font-size: 3rem;"></i>
                     <h4 class="mt-3 mb-2">Tidak Ada Langganan Aktif</h4>
                     <p class="mb-3 text-muted">Anda belum memiliki paket aktif. Silakan berlangganan untuk menikmati layanan kami.</p>
-                    <a href="{{ route('landing') }}" class="btn btn-primary">
+                    <a href="{{ route('landing') }}#pricing" class="btn btn-primary">
                         <i class="mdi mdi-package-variant me-2"></i> Lihat Paket
                     </a>
                 </div>
@@ -262,8 +262,8 @@
             </div>
             <!-- Transaction Status Chart -->
             <div class="col-md-4 mb-3">
-                <div class="card">
-                    <div class="card-header">
+            <div class="card" style="width: 340px; padding: 10px; font-size: 14px; margin-left: 20px;">
+            <div class="card-header">
                         <div>
                             <h5 class="card-title">Status Transaksi</h5>
                             <p class="card-subtitle mb-0">Breakdown status transaksi</p>
@@ -285,9 +285,9 @@
                     <p class="card-subtitle mb-0">Invoice pembayaran Anda</p>
                 </div>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body" style="padding: 0;">
                 <div class="table-responsive">
-                    <table class="table" id="invoicesTable">
+                    <table class="table table-striped table-hover" id="invoicesTable">
                         <thead>
                             <tr>
                                 <th>PACKAGE</th>
@@ -336,9 +336,9 @@
                     <p class="card-subtitle mb-0">Semua riwayat transaksi Anda</p>
                 </div>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body" style="padding: 0;">
                 <div class="table-responsive">
-                    <table class="table" id="transactionHistoryTable">
+                    <table class="table table-striped table-hover" id="transactionHistoryTable">
                         <thead>
                             <tr>
                                 <th>PACKAGE</th>
@@ -617,100 +617,103 @@
         }
         @endif
 
-        // Initialize DataTables
-        $(document).ready(function() {
-            if (typeof $.fn.DataTable === 'undefined') {
-                console.error('DataTables is not loaded');
-                return;
+        // Initialize DataTables - Ensure it loads after Chart.js
+        (function() {
+            function initDataTables() {
+                try {
+                    // Invoices Table
+                    if ($('#invoicesTable').length) {
+                        if ($.fn.DataTable.isDataTable('#invoicesTable')) {
+                            $('#invoicesTable').DataTable().destroy();
+                        }
+                        
+                        $('#invoicesTable').DataTable({
+                            language: {
+                                search: "Cari:",
+                                searchPlaceholder: "Cari invoice...",
+                                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                                infoFiltered: "(difilter dari _MAX_ total data)",
+                                paginate: {
+                                    first: "Pertama",
+                                    last: "Terakhir",
+                                    next: "Selanjutnya",
+                                    previous: "Sebelumnya"
+                                },
+                                emptyTable: "Tidak ada data invoice",
+                                zeroRecords: "Tidak ada data yang cocok dengan pencarian"
+                            },
+                            responsive: true,
+                            pageLength: 10,
+                            lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
+                            order: [[2, 'desc']],
+                            columnDefs: [
+                                { orderable: false, targets: 5 }
+                            ],
+                            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                            drawCallback: function() {
+                                console.log('Invoices table draw completed');
+                            }
+                        });
+                        
+                        console.log('DataTables invoicesTable initialized successfully');
+                    }
+
+                    // Transaction History Table
+                    if ($('#transactionHistoryTable').length) {
+                        if ($.fn.DataTable.isDataTable('#transactionHistoryTable')) {
+                            $('#transactionHistoryTable').DataTable().destroy();
+                        }
+                        
+                        $('#transactionHistoryTable').DataTable({
+                            language: {
+                                search: "Cari:",
+                                searchPlaceholder: "Cari transaksi...",
+                                lengthMenu: "Tampilkan _MENU_ data per halaman",
+                                info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                                infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                                infoFiltered: "(difilter dari _MAX_ total data)",
+                                paginate: {
+                                    first: "Pertama",
+                                    last: "Terakhir",
+                                    next: "Selanjutnya",
+                                    previous: "Sebelumnya"
+                                },
+                                emptyTable: "Tidak ada data transaksi",
+                                zeroRecords: "Tidak ada data yang cocok dengan pencarian"
+                            },
+                            responsive: true,
+                            pageLength: 10,
+                            lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
+                            order: [[2, 'desc']],
+                            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                            drawCallback: function() {
+                                console.log('Transaction history table draw completed');
+                            }
+                        });
+                        
+                        console.log('DataTables transactionHistoryTable initialized successfully');
+                    }
+                    
+                    console.log('All DataTables initialized');
+                    console.log('Search boxes:', $('.dataTables_filter').length);
+                    console.log('Pagination:', $('.dataTables_paginate').length);
+                } catch (error) {
+                    console.error('Error initializing DataTables:', error);
+                }
             }
             
-            // Invoices Table
-            $('#invoicesTable').DataTable({
-                language: {
-                    search: "Cari:",
-                    searchPlaceholder: "Cari invoice...",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                    infoFiltered: "(difilter dari _MAX_ total data)",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    },
-                    emptyTable: "Tidak ada data invoice",
-                    zeroRecords: "Tidak ada data yang cocok dengan pencarian",
-                    buttons: {
-                        copy: "Salin",
-                        csv: "CSV",
-                        excel: "Excel",
-                        pdf: "PDF",
-                        print: "Cetak",
-                        colvis: "Tampilkan Kolom"
-                    }
-                },
-                responsive: true,
-                pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
-                order: [[2, 'desc']], // Sort by DATE column (index 2) descending
-                columnDefs: [
-                    { orderable: false, targets: 5 }, // Disable sorting on ACTIONS column
-                    { responsivePriority: 1, targets: 0 }, // Package
-                    { responsivePriority: 2, targets: 5 } // Actions
-                ],
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'colvis', text: 'Kolom', className: 'btn btn-light btn-sm' },
-                    { extend: 'copy', text: 'Salin', className: 'btn btn-light btn-sm' },
-                    { extend: 'csv', text: 'CSV', className: 'btn btn-light btn-sm' },
-                    { extend: 'excel', text: 'Excel', className: 'btn btn-light btn-sm' },
-                    { extend: 'pdf', text: 'PDF', className: 'btn btn-light btn-sm', orientation: 'landscape' },
-                    { extend: 'print', text: 'Cetak', className: 'btn btn-light btn-sm' }
-                ]
+            // Wait for Chart.js to finish, then init DataTables
+            window.addEventListener('load', function() {
+                setTimeout(initDataTables, 500);
             });
-
-            // Transaction History Table
-            $('#transactionHistoryTable').DataTable({
-                language: {
-                    search: "Cari:",
-                    searchPlaceholder: "Cari transaksi...",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                    infoFiltered: "(difilter dari _MAX_ total data)",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    },
-                    emptyTable: "Tidak ada data transaksi",
-                    zeroRecords: "Tidak ada data yang cocok dengan pencarian",
-                    buttons: {
-                        copy: "Salin",
-                        csv: "CSV",
-                        excel: "Excel",
-                        pdf: "PDF",
-                        print: "Cetak",
-                        colvis: "Tampilkan Kolom"
-                    }
-                },
-                responsive: true,
-                pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
-                order: [[2, 'desc']], // Sort by DATE column (index 2) descending
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'colvis', text: 'Kolom', className: 'btn btn-light btn-sm' },
-                    { extend: 'copy', text: 'Salin', className: 'btn btn-light btn-sm' },
-                    { extend: 'csv', text: 'CSV', className: 'btn btn-light btn-sm' },
-                    { extend: 'excel', text: 'Excel', className: 'btn btn-light btn-sm' },
-                    { extend: 'pdf', text: 'PDF', className: 'btn btn-light btn-sm', orientation: 'landscape' },
-                    { extend: 'print', text: 'Cetak', className: 'btn btn-light btn-sm' }
-                ]
+            
+            // Also try on DOM ready
+            $(document).ready(function() {
+                setTimeout(initDataTables, 600);
             });
-        });
+        })();
     </script>
 </body>
 </html>

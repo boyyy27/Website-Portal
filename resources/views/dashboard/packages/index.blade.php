@@ -181,9 +181,9 @@
                     <p class="card-subtitle mb-0">Semua paket yang tersedia di sistem</p>
                 </div>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body" style="padding: 0;">
                 <div class="table-responsive">
-                    <table class="table" id="packagesTable">
+                    <table class="table table-striped table-hover" id="packagesTable">
                         <thead>
                             <tr>
                                 <th>PACKAGE NAME</th>
@@ -283,73 +283,76 @@
             }
         }
 
-        // Initialize DataTables
-        $(document).ready(function() {
-            if (typeof $.fn.DataTable === 'undefined') {
-                console.error('DataTables is not loaded');
-                return;
+        // Initialize DataTables - Ensure it loads after everything
+        (function() {
+            function initDataTable() {
+                // Check if already initialized
+                if ($.fn.DataTable.isDataTable('#packagesTable')) {
+                    console.log('DataTables already initialized');
+                    return;
+                }
+                
+                try {
+                    // Destroy existing instance if any
+                    if ($.fn.DataTable.isDataTable('#packagesTable')) {
+                        $('#packagesTable').DataTable().destroy();
+                    }
+                    
+                    var table = $('#packagesTable').DataTable({
+                        language: {
+                            search: "Cari:",
+                            searchPlaceholder: "Cari paket...",
+                            lengthMenu: "Tampilkan _MENU_ data per halaman",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                            infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                            infoFiltered: "(difilter dari _MAX_ total data)",
+                            paginate: {
+                                first: "Pertama",
+                                last: "Terakhir",
+                                next: "Selanjutnya",
+                                previous: "Sebelumnya"
+                            },
+                            emptyTable: "Tidak ada data paket",
+                            zeroRecords: "Tidak ada data yang cocok dengan pencarian"
+                        },
+                        responsive: true,
+                        pageLength: 10,
+                        lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
+                        order: [[0, 'asc']],
+                        columnDefs: [
+                            { orderable: false, targets: 6 }
+                        ],
+                        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                        drawCallback: function() {
+                            console.log('DataTables draw completed');
+                            console.log('Search box visible:', $('.dataTables_filter').is(':visible'));
+                            console.log('Pagination visible:', $('.dataTables_paginate').is(':visible'));
+                        }
+                    });
+                    
+                    console.log('DataTables packagesTable initialized successfully');
+                    console.log('Table wrapper:', $('.dataTables_wrapper').length);
+                    console.log('Search box:', $('.dataTables_filter').length);
+                    console.log('Pagination:', $('.dataTables_paginate').length);
+                } catch (error) {
+                    console.error('Error initializing DataTables:', error);
+                }
             }
             
-            $('#packagesTable').DataTable({
-                language: {
-                    search: "Cari:",
-                    searchPlaceholder: "Cari paket...",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                    infoFiltered: "(difilter dari _MAX_ total data)",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    },
-                    emptyTable: "Tidak ada data paket",
-                    zeroRecords: "Tidak ada data yang cocok dengan pencarian"
-                },
-                responsive: true,
-                pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
-                order: [[0, 'asc']],
-                columnDefs: [
-                    { orderable: false, targets: 6 }
-                ],
-                dom: 'Bfrtip',
-                buttons: [
-                    {
-                        extend: 'colvis',
-                        text: 'Kolom',
-                        className: 'btn btn-light btn-sm'
-                    },
-                    {
-                        extend: 'copy',
-                        text: 'Salin',
-                        className: 'btn btn-light btn-sm'
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'CSV',
-                        className: 'btn btn-light btn-sm'
-                    },
-                    {
-                        extend: 'excel',
-                        text: 'Excel',
-                        className: 'btn btn-light btn-sm'
-                    },
-                    {
-                        extend: 'pdf',
-                        text: 'PDF',
-                        className: 'btn btn-light btn-sm',
-                        orientation: 'landscape'
-                    },
-                    {
-                        extend: 'print',
-                        text: 'Cetak',
-                        className: 'btn btn-light btn-sm'
-                    }
-                ]
+            // Try multiple times to ensure it loads
+            if (document.readyState === 'complete') {
+                setTimeout(initDataTable, 200);
+            } else {
+                window.addEventListener('load', function() {
+                    setTimeout(initDataTable, 200);
+                });
+            }
+            
+            // Also try on DOM ready
+            $(document).ready(function() {
+                setTimeout(initDataTable, 300);
             });
-        });
+        })();
     </script>
 </body>
 </html>

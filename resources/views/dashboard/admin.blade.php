@@ -205,7 +205,7 @@
             </div>
             <!-- Transaction Status Chart -->
             <div class="col-md-4 mb-3">
-                <div class="card">
+                <div class="card" style="width: 300px; padding: 10px; font-size: 14px; margin-left: 20px;">
                     <div class="card-header">
                 <div>
                     <h5 class="card-title">Status Transaksi</h5>
@@ -260,9 +260,9 @@
                 </div>
                 <a href="{{ route('admin.transactions') }}" class="btn btn-sm btn-primary">View All</a>
             </div>
-            <div class="card-body p-0">
+            <div class="card-body" style="padding: 0;">
                 <div class="table-responsive">
-                    <table class="table" id="recentTransactionsTable">
+                    <table class="table table-striped table-hover" id="recentTransactionsTable">
                         <thead>
                             <tr>
                                 <th>ORDER ID</th>
@@ -669,58 +669,72 @@
             });
         }
 
-        // Initialize DataTables
-        $(document).ready(function() {
-            if (typeof $.fn.DataTable === 'undefined') {
-                console.error('DataTables is not loaded');
-                return;
+        // Initialize DataTables - Ensure it loads after Chart.js
+        (function() {
+            function initDataTable() {
+                // Check if already initialized
+                if ($.fn.DataTable.isDataTable('#recentTransactionsTable')) {
+                    console.log('DataTables already initialized');
+                    return;
+                }
+                
+                try {
+                    // Destroy existing instance if any
+                    if ($.fn.DataTable.isDataTable('#recentTransactionsTable')) {
+                        $('#recentTransactionsTable').DataTable().destroy();
+                    }
+                    
+                    var table = $('#recentTransactionsTable').DataTable({
+                        language: {
+                            search: "Cari:",
+                            searchPlaceholder: "Cari transaksi...",
+                            lengthMenu: "Tampilkan _MENU_ data per halaman",
+                            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                            infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                            infoFiltered: "(difilter dari _MAX_ total data)",
+                            paginate: {
+                                first: "Pertama",
+                                last: "Terakhir",
+                                next: "Selanjutnya",
+                                previous: "Sebelumnya"
+                            },
+                            emptyTable: "Tidak ada data transaksi",
+                            zeroRecords: "Tidak ada data yang cocok dengan pencarian"
+                        },
+                        responsive: true,
+                        pageLength: 5,
+                        lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Semua"]],
+                        order: [[5, 'desc']],
+                        columnDefs: [
+                            { orderable: false, targets: 6 }
+                        ],
+                        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+                        drawCallback: function() {
+                            console.log('DataTables draw completed');
+                            console.log('Search box visible:', $('.dataTables_filter').is(':visible'));
+                            console.log('Pagination visible:', $('.dataTables_paginate').is(':visible'));
+                        }
+                    });
+                    
+                    console.log('DataTables recentTransactionsTable initialized successfully');
+                    console.log('Table wrapper:', $('.dataTables_wrapper').length);
+                    console.log('Search box:', $('.dataTables_filter').length);
+                    console.log('Pagination:', $('.dataTables_paginate').length);
+                } catch (error) {
+                    console.error('Error initializing DataTables:', error);
+                }
             }
             
-            $('#recentTransactionsTable').DataTable({
-                language: {
-                    search: "Cari:",
-                    searchPlaceholder: "Cari transaksi...",
-                    lengthMenu: "Tampilkan _MENU_ data per halaman",
-                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
-                    infoFiltered: "(difilter dari _MAX_ total data)",
-                    paginate: {
-                        first: "Pertama",
-                        last: "Terakhir",
-                        next: "Selanjutnya",
-                        previous: "Sebelumnya"
-                    },
-                    emptyTable: "Tidak ada data transaksi",
-                    zeroRecords: "Tidak ada data yang cocok dengan pencarian",
-                    buttons: {
-                        copy: "Salin",
-                        csv: "CSV",
-                        excel: "Excel",
-                        pdf: "PDF",
-                        print: "Cetak",
-                        colvis: "Tampilkan Kolom"
-                    }
-                },
-                responsive: true,
-                pageLength: 5,
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Semua"]],
-                order: [[5, 'desc']], // Sort by CREATED column (index 5) descending
-                columnDefs: [
-                    { orderable: false, targets: 6 }, // Disable sorting on ACTIONS column
-                    { responsivePriority: 1, targets: 0 }, // Order ID
-                    { responsivePriority: 2, targets: 6 } // Actions
-                ],
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'colvis', text: 'Kolom', className: 'btn btn-light btn-sm' },
-                    { extend: 'copy', text: 'Salin', className: 'btn btn-light btn-sm' },
-                    { extend: 'csv', text: 'CSV', className: 'btn btn-light btn-sm' },
-                    { extend: 'excel', text: 'Excel', className: 'btn btn-light btn-sm' },
-                    { extend: 'pdf', text: 'PDF', className: 'btn btn-light btn-sm', orientation: 'landscape' },
-                    { extend: 'print', text: 'Cetak', className: 'btn btn-light btn-sm' }
-                ]
+            // Wait for Chart.js to finish, then init DataTables
+            window.addEventListener('load', function() {
+                setTimeout(initDataTable, 500);
             });
-        });
+            
+            // Also try on DOM ready
+            $(document).ready(function() {
+                setTimeout(initDataTable, 600);
+            });
+        })();
     </script>
 </body>
 </html>

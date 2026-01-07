@@ -81,19 +81,7 @@
             </nav>
         </div>
         <div class="top-header-right">
-            <div class="top-header-icon">
-                <i class="mdi mdi-magnify"></i>
-            </div>
-            <div class="top-header-icon">
-                <i class="mdi mdi-forum-outline"></i>
-            </div>
-            <div class="top-header-icon">
-                <i class="mdi mdi-bell-outline"></i>
-                <span class="badge">3</span>
-            </div>
-            <div class="top-header-icon">
-                <i class="mdi mdi-view-grid-outline"></i>
-            </div>
+            
             <div class="top-header-icon">
                 <i class="mdi mdi-brightness-6"></i>
             </div>
