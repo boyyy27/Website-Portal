@@ -21,7 +21,20 @@ class PackageController extends Controller
         }
 
         $packages = Package::orderBy('created_at', 'desc')->get();
-        return view('dashboard.packages.index', compact('packages'));
+        
+        // Statistics for packages page
+        $totalPackages = Package::count();
+        $activePackages = Package::where('is_active', true)->count();
+        $inactivePackages = Package::where('is_active', false)->count();
+        $totalPackageTransactions = \App\Models\Transaction::whereHas('package')->count();
+        
+        return view('dashboard.packages.index', compact(
+            'packages',
+            'totalPackages',
+            'activePackages',
+            'inactivePackages',
+            'totalPackageTransactions'
+        ));
     }
 
     /**

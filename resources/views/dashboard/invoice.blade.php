@@ -44,7 +44,7 @@
             @if(Auth::user()->isAdmin())
                 <a href="{{ route('admin.transactions') }}" class="btn btn-secondary">Kembali</a>
             @else
-                <a href="{{ route('user.dashboard') }}" class="btn btn-secondary">Kembali</a>
+            <a href="{{ route('user.dashboard') }}" class="btn btn-secondary">Kembali</a>
             @endif
         </div>
 

@@ -64,6 +64,23 @@ class DashboardController extends Controller
             ->orderBy('month', 'asc')
             ->get();
 
+        // Get daily sales (last 7 days)
+        $dailySales = Transaction::settled()
+            ->select(DB::raw("DATE(created_at) as date"), DB::raw('sum(gross_amount) as revenue'))
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
+
+        // Get package sales data
+        $packageSales = Transaction::settled()
+            ->join('packages', 'transactions.package_id', '=', 'packages.id')
+            ->select('packages.name', DB::raw('sum(transactions.gross_amount) as revenue'), DB::raw('count(*) as count'))
+            ->groupBy('packages.id', 'packages.name')
+            ->orderBy('revenue', 'desc')
+            ->limit(5)
+            ->get();
+
         return view('dashboard.admin', compact(
             'totalTransactions',
             'pendingTransactions',
@@ -72,7 +89,9 @@ class DashboardController extends Controller
             'recentTransactions',
             'transactionsByStatus',
             'packages',
-            'monthlyRevenue'
+            'monthlyRevenue',
+            'dailySales',
+            'packageSales'
         ));
     }
 
@@ -89,9 +108,46 @@ class DashboardController extends Controller
 
         $transactions = Transaction::with(['user', 'package'])
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->get();
 
-        return view('dashboard.transactions', compact('transactions'));
+        // Statistics for transactions page
+        $totalTransactions = Transaction::count();
+        $pendingTransactions = Transaction::pending()->count();
+        $settledTransactions = Transaction::settled()->count();
+        $totalRevenue = Transaction::settled()->sum('gross_amount');
+
+        return view('dashboard.transactions', compact(
+            'transactions',
+            'totalTransactions',
+            'pendingTransactions',
+            'settledTransactions',
+            'totalRevenue'
+        ));
+    }
+
+    /**
+     * Delete a transaction
+     */
+    public function deleteTransaction($id)
+    {
+        $user = Auth::user();
+
+        if (!$user->isAdmin()) {
+            return redirect()->route('user.dashboard')->with('error', 'Akses ditolak');
+        }
+
+        $transaction = Transaction::findOrFail($id);
+        
+        // Check if transaction is settled - might want to prevent deletion
+        if ($transaction->transaction_status === 'settlement') {
+            return redirect()->route('admin.transactions')
+                ->with('error', 'Transaksi yang sudah settlement tidak dapat dihapus');
+        }
+
+        $transaction->delete();
+
+        return redirect()->route('admin.transactions')
+            ->with('success', 'Transaksi berhasil dihapus');
     }
 
     /**
@@ -127,11 +183,37 @@ class DashboardController extends Controller
             ->orderBy('settlement_time', 'desc')
             ->get();
 
+        // Get user transaction history for chart (last 6 months)
+        $userMonthlyTransactions = Transaction::where('user_id', $user->id)
+            ->select(DB::raw("DATE_TRUNC('month', created_at) as month"), DB::raw('count(*) as count'))
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        // Get user transaction status breakdown
+        $userTransactionStatus = Transaction::where('user_id', $user->id)
+            ->select('transaction_status', DB::raw('count(*) as total'))
+            ->groupBy('transaction_status')
+            ->get();
+
+        // Statistics for user dashboard
+        $totalTransactions = Transaction::where('user_id', $user->id)->count();
+        $pendingTransactions = Transaction::where('user_id', $user->id)->where('transaction_status', 'pending')->count();
+        $settledTransactions = Transaction::where('user_id', $user->id)->where('transaction_status', 'settlement')->count();
+        $totalSpent = Transaction::where('user_id', $user->id)->where('transaction_status', 'settlement')->sum('gross_amount');
+
         return view('dashboard.user', compact(
             'activeSubscription',
             'subscriptions',
             'transactions',
-            'invoices'
+            'invoices',
+            'userMonthlyTransactions',
+            'userTransactionStatus',
+            'totalTransactions',
+            'pendingTransactions',
+            'settledTransactions',
+            'totalSpent'
         ));
     }
 

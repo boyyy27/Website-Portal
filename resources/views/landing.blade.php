@@ -631,7 +631,7 @@
                                                 </button>
                                                 <small class="d-block mt-2 text-muted">Anda sudah memiliki paket aktif</small>
                                             @else
-                                                <a href="{{ route('payment.checkout', $package->id) }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Beli Sekarang</a>
+                                            <a href="{{ route('payment.checkout', $package->id) }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Beli Sekarang</a>
                                             @endif
                                         @else
                                             <a href="{{ route('register') }}" class="btn {{ $isPopular ? 'btn-primary' : 'btn-outline-primary' }} btn-rounded">Get Started</a>

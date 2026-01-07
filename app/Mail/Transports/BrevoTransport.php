@@ -212,3 +212,4 @@ class BrevoTransport implements Swift_Transport
         // Not needed for Brevo API
     }
 }
+

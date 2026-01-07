@@ -48,6 +48,9 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
             
+            $user = Auth::user();
+            
+            // Redirect ke dashboard (user sudah verified karena sudah di-check di atas)
             return redirect()->intended(route('dashboard'))->with('success', 'Login berhasil!');
         }
 

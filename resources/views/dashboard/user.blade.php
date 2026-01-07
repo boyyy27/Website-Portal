@@ -6,20 +6,25 @@
     <title>Dashboard - OMILE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/alert-animations.css') }}">
 </head>
 <body>
+    <!-- Mobile Toggle -->
     <button class="sidebar-mobile-toggle" onclick="toggleSidebar()">
         <i class="mdi mdi-menu"></i>
     </button>
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
+    <!-- Dark Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <img src="{{ asset('assets/images/favicon.ico') }}" alt="OMILE Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div style="display: none; width: 40px; height: 40px; background: linear-gradient(135deg, #2f55d4 0%, #f58905 100%); border-radius: 8px; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">O</div>
+                <div class="logo-fallback">O</div>
                 <div class="sidebar-logo-text">
                     <h4>OMILE</h4>
                     <small>User Dashboard</small>
@@ -29,7 +34,7 @@
                 <i class="mdi mdi-chevron-left" id="sidebar-toggle-icon"></i>
             </button>
         </div>
-        <nav class="nav flex-column">
+        <nav class="sidebar-nav">
             <a class="nav-link active" href="{{ route('user.dashboard') }}" data-tooltip="Dashboard">
                 <i class="mdi mdi-view-dashboard"></i>
                 <span class="nav-text">Dashboard</span>
@@ -38,60 +43,71 @@
                 <i class="mdi mdi-home"></i>
                 <span class="nav-text">Landing Page</span>
             </a>
+            <div class="sidebar-sep"></div>
             <form action="{{ route('logout') }}" method="POST" class="px-3 mt-3">
                 @csrf
-                <button type="submit" class="btn btn-outline-light w-100" id="logout-btn">
-                    <i class="mdi mdi-logout me-2"></i>
+                <button type="submit" class="nav-link w-100 text-start" style="background: transparent; border: none; cursor: pointer;" id="logout-btn">
+                    <i class="mdi mdi-logout"></i>
                     <span class="logout-text">Logout</span>
                 </button>
             </form>
         </nav>
     </div>
 
-    <div class="main-content" id="main-content">
-        @php
-            // Set timezone ke Asia/Jakarta (WIB)
-            $now = \Carbon\Carbon::now('Asia/Jakarta');
-            $hour = $now->format('H');
-            
-            $greeting = 'Selamat Datang';
-            if ($hour >= 5 && $hour < 12) {
-                $greeting = 'Selamat Pagi';
-            } elseif ($hour >= 12 && $hour < 15) {
-                $greeting = 'Selamat Siang';
-            } elseif ($hour >= 15 && $hour < 19) {
-                $greeting = 'Selamat Sore';
-            } else {
-                $greeting = 'Selamat Malam';
-            }
-            
-            // Format tanggal Indonesia
-            $days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            $months = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            
-            $dayName = $days[$now->format('w')];
-            $day = $now->format('d');
-            $month = $months[(int)$now->format('m')];
-            $year = $now->format('Y');
-            $currentDate = $dayName . ', ' . $day . ' ' . $month . ' ' . $year;
-            $currentTime = $now->format('H:i');
-        @endphp
-        
-        <div class="dashboard-header">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <div class="greeting-text">{{ $greeting }}, {{ Auth::user()->name }}! 👋</div>
-                    <div class="greeting-subtitle">Selamat datang kembali di Dashboard Anda</div>
-                    <div class="header-date">
-                        <i class="mdi mdi-calendar-clock me-1"></i>
-                        {{ $currentDate }} | {{ $currentTime }} WIB
-                    </div>
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="top-header-left">
+            <nav class="top-header-nav">
+                <a href="{{ route('user.dashboard') }}" class="active">Dashboards</a>
+                <a href="{{ route('landing') }}">Pages</a>
+            </nav>
+        </div>
+        <div class="top-header-right">
+           
+            <div class="top-header-icon">
+                <i class="mdi mdi-brightness-6"></i>
+            </div>
+            <div class="top-header-user">
+                <div class="top-header-user-avatar">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    <span class="online-dot"></span>
                 </div>
-                <div class="text-end">
-                    <i class="mdi mdi-account-circle" style="font-size: 4rem; opacity: 0.3;"></i>
+                <span class="top-header-user-name">{{ Auth::user()->name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    @php
+                        $now = \Carbon\Carbon::now('Asia/Jakarta');
+                        $hour = $now->format('H');
+                        $greeting = 'Selamat Datang';
+                        if ($hour >= 5 && $hour < 12) {
+                            $greeting = 'Selamat Pagi';
+                        } elseif ($hour >= 12 && $hour < 15) {
+                            $greeting = 'Selamat Siang';
+                        } elseif ($hour >= 15 && $hour < 19) {
+                            $greeting = 'Selamat Sore';
+                        } else {
+                            $greeting = 'Selamat Malam';
+                        }
+                    @endphp
+                    <h1 class="page-title">{{ $greeting }}, {{ Auth::user()->name }}! 👋</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('user.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
+
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
@@ -106,193 +122,285 @@
             </div>
         @endif
 
-        <!-- Active Subscription Card -->
-        @if($activeSubscription)
-            <div class="subscription-card">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <h4 class="mb-2">
-                            <i class="mdi mdi-crown me-2"></i>
-                            Langganan Aktif
-                        </h4>
-                        <h3 class="mb-3">{{ $activeSubscription->package->name }}</h3>
-                        <p class="mb-2">
-                            <i class="mdi mdi-calendar me-2"></i>
-                            Mulai: {{ $activeSubscription->start_date->format('d M Y') }}
-                        </p>
-                        <p class="mb-2">
-                            <i class="mdi mdi-calendar-check me-2"></i>
-                            Berakhir: {{ $activeSubscription->end_date->format('d M Y') }}
-                        </p>
-                        <div class="mt-3">
-                            <small class="opacity-75">Masa aktif tersisa:</small>
-                            <div class="countdown" id="countdown">
-                                <span id="days">{{ $activeSubscription->end_date->diffInDays(now()) }}</span> hari
-                            </div>
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon primary">
+                            <i class="mdi mdi-cash-multiple"></i>
                         </div>
                     </div>
-                    <div class="text-end">
-                        <span class="badge bg-light text-dark px-3 py-2">
-                            <i class="mdi mdi-check-circle me-1"></i> Aktif
-                        </span>
+                    <h3 class="stat-card-value">{{ number_format($totalTransactions, 0, ',', '.') }}</h3>
+                    <p class="stat-card-label">Total Transaksi</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon warning">
+                            <i class="mdi mdi-clock-outline"></i>
+                        </div>
+                    </div>
+                    <h3 class="stat-card-value">{{ number_format($pendingTransactions, 0, ',', '.') }}</h3>
+                    <p class="stat-card-label">Pending</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon success">
+                            <i class="mdi mdi-check-circle"></i>
+                        </div>
+                    </div>
+                    <h3 class="stat-card-value">{{ number_format($settledTransactions, 0, ',', '.') }}</h3>
+                    <p class="stat-card-label">Berhasil</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon info">
+                            <i class="mdi mdi-currency-usd"></i>
+                        </div>
+                    </div>
+                    <h3 class="stat-card-value">Rp {{ number_format($totalSpent, 0, ',', '.') }}</h3>
+                    <p class="stat-card-label">Total Pengeluaran</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Subscription Card -->
+        @if($activeSubscription)
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div>
+                        <h5 class="card-title mb-0">
+                            <i class="mdi mdi-crown me-2"></i>
+                            Langganan Aktif
+                        </h5>
+                        <p class="card-subtitle mb-0 text-white" style="opacity: 0.9;">Detail paket Anda saat ini</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="mb-3">{{ $activeSubscription->package->name }}</h3>
+                            <p class="mb-2">
+                                <i class="mdi mdi-calendar me-2"></i>
+                                <strong>Mulai:</strong> {{ $activeSubscription->start_date->format('d M Y') }}
+                            </p>
+                            <p class="mb-2">
+                                <i class="mdi mdi-calendar-check me-2"></i>
+                                <strong>Berakhir:</strong> {{ $activeSubscription->end_date->format('d M Y') }}
+                            </p>
+                            <div class="mt-3">
+                                <small class="text-muted">Masa aktif tersisa:</small>
+                                <div class="h4 mb-0" id="days">{{ $activeSubscription->end_date->diffInDays(now()) }}</div>
+                                <small class="text-muted">hari</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge badge-soft success" style="font-size: 1rem; padding: 10px 16px;">
+                                <i class="mdi mdi-check-circle me-1"></i> Aktif
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- TMS Access Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <div>
+                        <h5 class="card-title mb-0">
+                            <i class="mdi mdi-web me-2"></i>
+                            Akses TMS
+                        </h5>
+                        <p class="card-subtitle mb-0 text-white" style="opacity: 0.9;">Transportation Management System</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Setelah pembayaran berhasil, Anda dapat mengakses sistem TMS untuk mengelola distribusi dan logistik Anda.
+                    </p>
+                    <a href="{{ route('tms.access') }}" class="btn btn-primary btn-lg" target="_blank">
+                        <i class="mdi mdi-open-in-new me-2"></i>
+                        Buka TMS Dashboard
+                    </a>
+                </div>
+            </div>
         @else
-            <div class="subscription-card expired">
-                <div class="text-center">
-                    <i class="mdi mdi-alert-circle" style="font-size: 3rem;"></i>
+            <div class="card mb-4">
+                <div class="card-body text-center py-5">
+                    <i class="mdi mdi-alert-circle text-warning" style="font-size: 3rem;"></i>
                     <h4 class="mt-3 mb-2">Tidak Ada Langganan Aktif</h4>
-                    <p class="mb-3">Anda belum memiliki paket aktif. Silakan berlangganan untuk menikmati layanan kami.</p>
-                    <a href="{{ route('landing') }}" class="btn btn-light">
+                    <p class="mb-3 text-muted">Anda belum memiliki paket aktif. Silakan berlangganan untuk menikmati layanan kami.</p>
+                    <a href="{{ route('landing') }}" class="btn btn-primary">
                         <i class="mdi mdi-package-variant me-2"></i> Lihat Paket
                     </a>
                 </div>
             </div>
         @endif
 
-        <!-- TMS Access Section (only show if user has active subscription) -->
-        @if($activeSubscription)
-        <div class="card mt-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="mdi mdi-web me-2"></i>
-                    Akses TMS (Transportation Management System)
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="text-muted mb-4">
-                    Setelah pembayaran berhasil, Anda dapat mengakses sistem TMS untuk mengelola distribusi dan logistik Anda.
-                </p> 
-                    <div class="col-md-6 mb-3">
-                        <div class="border rounded p-3 h-100 d-flex flex-column justify-content-center">
-                            <h6 class="mb-3">
-                                <i class="mdi mdi-rocket-launch me-2 text-success"></i>
-                                Akses Cepat
-                            </h6>
-                            <p class="text-muted small mb-3">
-                                Klik tombol di bawah untuk langsung mengakses TMS. Anda akan diarahkan ke halaman login TMS.
-                            </p>
-                            <a href="{{ route('tms.access') }}" class="btn btn-primary btn-lg w-100" target="_blank">
-                                <i class="mdi mdi-open-in-new me-2"></i>
-                                Buka TMS Dashboard
-                            </a>
-                            <small class="text-muted mt-2 d-block text-center">
-                                <i class="mdi mdi-information me-1"></i>
-                                Gunakan credentials di atas untuk login
-                            </small>
+        <!-- Charts Row -->
+        @if($transactions->count() > 0)
+        <div class="row mb-4">
+            <!-- Transaction History Chart -->
+            <div class="col-md-8 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h5 class="card-title">Riwayat Transaksi</h5>
+                            <p class="card-subtitle mb-0">Transaksi Anda selama 6 bulan terakhir</p>
                         </div>
                     </div>
-            
-
-                <div class="alert alert-info mt-3 mb-0">
-                    <i class="mdi mdi-lightbulb-on me-2"></i>
-                    <strong>Tips:</strong> Simpan informasi login ini dengan aman. Anda dapat mengakses TMS selama langganan Anda masih aktif.
+                    <div class="card-body">
+                        <canvas id="userTransactionChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Transaction Status Chart -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h5 class="card-title">Status Transaksi</h5>
+                            <p class="card-subtitle mb-0">Breakdown status transaksi</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="userStatusChart" height="200"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
         @endif
 
-        <div class="row">
-            <!-- Invoices Section -->
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="mdi mdi-file-document-multiple me-2"></i> Invoice
-                    </div>
-                    <div class="card-body p-0">
-                        @forelse($invoices as $invoice)
-                            <div class="invoice-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ $invoice->package_name ?? $invoice->package->name ?? 'N/A' }}</h6>
-                                        <small class="text-muted">
-                                            Order ID: {{ $invoice->order_id }}<br>
-                                            Tanggal: {{ $invoice->settlement_time ? $invoice->settlement_time->format('d M Y H:i') : $invoice->created_at->format('d M Y H:i') }}
-                                        </small>
-                                    </div>
-                                    <div class="text-end">
-                                        <h6 class="mb-1">Rp {{ number_format($invoice->gross_amount, 0, ',', '.') }}</h6>
-                                        <span class="badge badge-status badge-settlement">Paid</span>
-                                        <div class="mt-2">
-                                            <a href="{{ route('user.invoice.download', $invoice->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                                                <i class="mdi mdi-download me-1"></i> Download
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-5 text-muted">
-                                <i class="mdi mdi-file-document-outline" style="font-size: 3rem;"></i>
-                                <p class="mt-3">Belum ada invoice</p>
-                            </div>
-                        @endforelse
-                    </div>
+        <!-- Invoices Section -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div>
+                    <h5 class="card-title">Invoice</h5>
+                    <p class="card-subtitle mb-0">Invoice pembayaran Anda</p>
                 </div>
             </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table" id="invoicesTable">
+                        <thead>
+                            <tr>
+                                <th>PACKAGE</th>
+                                <th>ORDER ID</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                                <th>STATUS</th>
+                                <th class="no-export">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($invoices as $invoice)
+                                <tr>
+                                    <td><strong>{{ $invoice->package_name ?? $invoice->package->name ?? 'N/A' }}</strong></td>
+                                    <td>{{ $invoice->order_id }}</td>
+                                    <td>{{ $invoice->settlement_time ? $invoice->settlement_time->format('d M Y H:i') : $invoice->created_at->format('d M Y H:i') }}</td>
+                                    <td><strong>Rp {{ number_format($invoice->gross_amount, 0, ',', '.') }}</strong></td>
+                                    <td>
+                                        <span class="badge badge-soft success">Paid</span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('user.invoice.download', $invoice->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="mdi mdi-download"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-5">
+                                        <i class="mdi mdi-file-document-outline" style="font-size: 3rem; opacity: 0.3;"></i>
+                                        <p class="mt-3">No invoices found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-            <!-- Transaction History -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="mdi mdi-history me-2"></i> Riwayat Transaksi
-                    </div>
-                    <div class="card-body p-0">
-                        @forelse($transactions->take(5) as $transaction)
-                            <div class="invoice-item">
-                                <div>
-                                    <h6 class="mb-1">{{ $transaction->package_name ?? $transaction->package->name ?? 'N/A' }}</h6>
-                                    <small class="text-muted">
-                                        {{ $transaction->created_at->format('d M Y') }}
-                                    </small>
-                                    <div class="mt-2">
+        <!-- Transaction History -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <div>
+                    <h5 class="card-title">Riwayat Transaksi</h5>
+                    <p class="card-subtitle mb-0">Semua riwayat transaksi Anda</p>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table" id="transactionHistoryTable">
+                        <thead>
+                            <tr>
+                                <th>PACKAGE</th>
+                                <th>ORDER ID</th>
+                                <th>DATE</th>
+                                <th>AMOUNT</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($transactions as $transaction)
+                                <tr>
+                                    <td><strong>{{ $transaction->package_name ?? $transaction->package->name ?? 'N/A' }}</strong></td>
+                                    <td>{{ $transaction->order_id }}</td>
+                                    <td>{{ $transaction->created_at->format('d M Y H:i') }}</td>
+                                    <td><strong>Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</strong></td>
+                                    <td>
                                         @if($transaction->transaction_status == 'settlement')
-                                            <span class="badge badge-status badge-settlement">Settlement</span>
+                                            <span class="badge badge-soft success">Settlement</span>
                                         @elseif($transaction->transaction_status == 'pending')
-                                            <span class="badge badge-status badge-pending">Pending</span>
+                                            <span class="badge badge-soft warning">Pending</span>
                                         @elseif($transaction->transaction_status == 'cancel')
-                                            <span class="badge badge-status badge-cancel">Cancel</span>
+                                            <span class="badge badge-soft danger">Cancel</span>
                                         @elseif($transaction->transaction_status == 'expire')
-                                            <span class="badge badge-status badge-expire">Expire</span>
+                                            <span class="badge badge-soft secondary">Expire</span>
                                         @else
-                                            <span class="badge badge-status">{{ $transaction->transaction_status }}</span>
+                                            <span class="badge badge-soft secondary">{{ $transaction->transaction_status }}</span>
                                         @endif
-                                        <span class="ms-2">Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="text-center py-5 text-muted">
-                                <i class="mdi mdi-information-outline" style="font-size: 2rem;"></i>
-                                <p class="mt-2 small">Belum ada transaksi</p>
-                            </div>
-                        @endforelse
-                    </div>
-                    @if($transactions->count() > 5)
-                        <div class="card-footer text-center">
-                            <a href="#" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
-                        </div>
-                    @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="mdi mdi-information-outline" style="font-size: 3rem; opacity: 0.3;"></i>
+                                        <p class="mt-3">No transactions found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <!-- All Subscriptions -->
-        <div class="card mt-4">
+        <div class="card">
             <div class="card-header">
-                <i class="mdi mdi-package-variant-closed me-2"></i> Semua Langganan
+                <div>
+                    <h5 class="card-title">Semua Langganan</h5>
+                    <p class="card-subtitle mb-0">Riwayat langganan Anda</p>
+                </div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead>
                             <tr>
-                                <th>Paket</th>
-                                <th>Tanggal Mulai</th>
-                                <th>Tanggal Berakhir</th>
-                                <th>Status</th>
-                                <th>Invoice</th>
+                                <th>PACKAGE</th>
+                                <th>START DATE</th>
+                                <th>END DATE</th>
+                                <th>STATUS</th>
+                                <th>INVOICE</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -303,9 +411,9 @@
                                     <td>{{ $subscription->end_date->format('d M Y') }}</td>
                                     <td>
                                         @if($subscription->is_active && $subscription->end_date > now())
-                                            <span class="badge bg-success">Aktif</span>
+                                            <span class="badge badge-soft success">Active</span>
                                         @else
-                                            <span class="badge bg-secondary">Berakhir</span>
+                                            <span class="badge badge-soft secondary">Expired</span>
                                         @endif
                                     </td>
                                     <td>
@@ -320,7 +428,10 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Belum ada langganan</td>
+                                    <td colspan="5" class="text-center text-muted py-5">
+                                        <i class="mdi mdi-package-variant" style="font-size: 3rem; opacity: 0.3;"></i>
+                                        <p class="mt-3">No subscriptions found</p>
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -329,9 +440,21 @@
             </div>
         </div>
     </div>
-    </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
     <script src="{{ asset('js/alert-auto-close.js') }}"></script>
     @if($activeSubscription)
     <script>
@@ -343,9 +466,6 @@
 
             if (diff > 0) {
                 const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                
                 document.getElementById('days').textContent = days;
             } else {
                 document.getElementById('days').textContent = '0';
@@ -357,6 +477,240 @@
     </script>
     @endif
     <script src="{{ asset('js/sidebar.js') }}"></script>
+    <script>
+        // Update sidebar toggle for new layout
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('sidebar-toggle-icon');
+            
+            if (!sidebar) return;
+            
+            sidebar.classList.toggle('collapsed');
+            
+            if (toggleIcon) {
+                if (sidebar.classList.contains('collapsed')) {
+                    toggleIcon.classList.remove('mdi-chevron-left');
+                    toggleIcon.classList.add('mdi-chevron-right');
+                } else {
+                    toggleIcon.classList.remove('mdi-chevron-right');
+                    toggleIcon.classList.add('mdi-chevron-left');
+                }
+            }
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('show');
+            }
+        }
+
+        // Chart.js Configuration
+        Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+        Chart.defaults.font.size = 12;
+        Chart.defaults.color = 'rgba(15, 23, 42, 0.7)';
+
+        @if($transactions->count() > 0)
+        // User Transaction History Chart (Line)
+        const userTransactionCtx = document.getElementById('userTransactionChart');
+        if (userTransactionCtx) {
+            const userTransactionData = @json($userMonthlyTransactions->map(function($item) {
+                return [
+                    \Carbon\Carbon::parse($item->month)->format('M Y'),
+                    (int)$item->count
+                ];
+            }));
+            
+            new Chart(userTransactionCtx, {
+                type: 'line',
+                data: {
+                    labels: userTransactionData.map(item => item[0]),
+                    datasets: [{
+                        label: 'Transactions',
+                        data: userTransactionData.map(item => item[1]),
+                        borderColor: '#2f55d4',
+                        backgroundColor: 'rgba(47, 85, 212, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#2f55d4',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(15, 23, 42, 0.05)'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // User Transaction Status Chart (Doughnut)
+        const userStatusCtx = document.getElementById('userStatusChart');
+        if (userStatusCtx) {
+            const userStatusData = @json($userTransactionStatus);
+            const userStatusLabels = userStatusData.map(item => {
+                const status = item.transaction_status;
+                return status.charAt(0).toUpperCase() + status.slice(1);
+            });
+            const userStatusCounts = userStatusData.map(item => item.total);
+            const colors = ['#16a34a', '#f59e0b', '#ef4444', '#6b7280', '#3b82f6'];
+            
+            new Chart(userStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: userStatusLabels,
+                    datasets: [{
+                        data: userStatusCounts,
+                        backgroundColor: colors.slice(0, userStatusLabels.length),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                usePointStyle: true,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12
+                        }
+                    }
+                }
+            });
+        }
+        @endif
+
+        // Initialize DataTables
+        $(document).ready(function() {
+            if (typeof $.fn.DataTable === 'undefined') {
+                console.error('DataTables is not loaded');
+                return;
+            }
+            
+            // Invoices Table
+            $('#invoicesTable').DataTable({
+                language: {
+                    search: "Cari:",
+                    searchPlaceholder: "Cari invoice...",
+                    lengthMenu: "Tampilkan _MENU_ data per halaman",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                    infoFiltered: "(difilter dari _MAX_ total data)",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Selanjutnya",
+                        previous: "Sebelumnya"
+                    },
+                    emptyTable: "Tidak ada data invoice",
+                    zeroRecords: "Tidak ada data yang cocok dengan pencarian",
+                    buttons: {
+                        copy: "Salin",
+                        csv: "CSV",
+                        excel: "Excel",
+                        pdf: "PDF",
+                        print: "Cetak",
+                        colvis: "Tampilkan Kolom"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
+                order: [[2, 'desc']], // Sort by DATE column (index 2) descending
+                columnDefs: [
+                    { orderable: false, targets: 5 }, // Disable sorting on ACTIONS column
+                    { responsivePriority: 1, targets: 0 }, // Package
+                    { responsivePriority: 2, targets: 5 } // Actions
+                ],
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'colvis', text: 'Kolom', className: 'btn btn-light btn-sm' },
+                    { extend: 'copy', text: 'Salin', className: 'btn btn-light btn-sm' },
+                    { extend: 'csv', text: 'CSV', className: 'btn btn-light btn-sm' },
+                    { extend: 'excel', text: 'Excel', className: 'btn btn-light btn-sm' },
+                    { extend: 'pdf', text: 'PDF', className: 'btn btn-light btn-sm', orientation: 'landscape' },
+                    { extend: 'print', text: 'Cetak', className: 'btn btn-light btn-sm' }
+                ]
+            });
+
+            // Transaction History Table
+            $('#transactionHistoryTable').DataTable({
+                language: {
+                    search: "Cari:",
+                    searchPlaceholder: "Cari transaksi...",
+                    lengthMenu: "Tampilkan _MENU_ data per halaman",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Menampilkan 0 sampai 0 dari 0 data",
+                    infoFiltered: "(difilter dari _MAX_ total data)",
+                    paginate: {
+                        first: "Pertama",
+                        last: "Terakhir",
+                        next: "Selanjutnya",
+                        previous: "Sebelumnya"
+                    },
+                    emptyTable: "Tidak ada data transaksi",
+                    zeroRecords: "Tidak ada data yang cocok dengan pencarian",
+                    buttons: {
+                        copy: "Salin",
+                        csv: "CSV",
+                        excel: "Excel",
+                        pdf: "PDF",
+                        print: "Cetak",
+                        colvis: "Tampilkan Kolom"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, 100, -1], [5, 10, 25, 50, 100, "Semua"]],
+                order: [[2, 'desc']], // Sort by DATE column (index 2) descending
+                dom: 'Bfrtip',
+                buttons: [
+                    { extend: 'colvis', text: 'Kolom', className: 'btn btn-light btn-sm' },
+                    { extend: 'copy', text: 'Salin', className: 'btn btn-light btn-sm' },
+                    { extend: 'csv', text: 'CSV', className: 'btn btn-light btn-sm' },
+                    { extend: 'excel', text: 'Excel', className: 'btn btn-light btn-sm' },
+                    { extend: 'pdf', text: 'PDF', className: 'btn btn-light btn-sm', orientation: 'landscape' },
+                    { extend: 'print', text: 'Cetak', className: 'btn btn-light btn-sm' }
+                ]
+            });
+        });
+    </script>
 </body>
 </html>
-

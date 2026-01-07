@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     // Transaction Routes
     Route::get('/admin/transactions', [DashboardController::class, 'allTransactions'])->name('admin.transactions');
     Route::get('/transaction/{id}', [DashboardController::class, 'showTransaction'])->name('admin.transaction.detail');
+    Route::delete('/admin/transaction/{id}', [DashboardController::class, 'deleteTransaction'])->name('admin.transaction.delete');
     Route::get('/invoice/{id}', [DashboardController::class, 'downloadInvoice'])->name('user.invoice.download');
     Route::get('/admin/transaction/{id}/invoice', [DashboardController::class, 'downloadInvoice'])->name('admin.transaction.invoice');
     

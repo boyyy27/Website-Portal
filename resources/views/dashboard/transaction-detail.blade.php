@@ -10,16 +10,18 @@
     <link rel="stylesheet" href="{{ asset('css/alert-animations.css') }}">
 </head>
 <body>
+    <!-- Mobile Toggle -->
     <button class="sidebar-mobile-toggle" onclick="toggleSidebar()">
         <i class="mdi mdi-menu"></i>
     </button>
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
+    <!-- Dark Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <img src="{{ asset('assets/images/favicon.ico') }}" alt="OMILE Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div style="display: none; width: 40px; height: 40px; background: linear-gradient(135deg, #2f55d4 0%, #f58905 100%); border-radius: 8px; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">O</div>
+                <div class="logo-fallback">O</div>
                 <div class="sidebar-logo-text">
                     <h4>OMILE</h4>
                     <small>{{ Auth::user()->isAdmin() ? 'Admin Panel' : 'User Dashboard' }}</small>
@@ -29,7 +31,7 @@
                 <i class="mdi mdi-chevron-left" id="sidebar-toggle-icon"></i>
             </button>
         </div>
-        <nav class="nav flex-column">
+        <nav class="sidebar-nav">
             @if(Auth::user()->isAdmin())
                 <a class="nav-link" href="{{ route('admin.dashboard') }}" data-tooltip="Dashboard">
                     <i class="mdi mdi-view-dashboard"></i>
@@ -53,25 +55,104 @@
                 <i class="mdi mdi-home"></i>
                 <span class="nav-text">Landing Page</span>
             </a>
+            <div class="sidebar-sep"></div>
             <form action="{{ route('logout') }}" method="POST" class="px-3 mt-3">
                 @csrf
-                <button type="submit" class="btn btn-outline-light w-100" id="logout-btn">
-                    <i class="mdi mdi-logout me-2"></i>
+                <button type="submit" class="nav-link w-100 text-start" style="background: transparent; border: none; cursor: pointer;" id="logout-btn">
+                    <i class="mdi mdi-logout"></i>
                     <span class="logout-text">Logout</span>
                 </button>
             </form>
         </nav>
     </div>
 
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="top-header-left">
+            <nav class="top-header-nav">
+                @if(Auth::user()->isAdmin())
+                    <a href="{{ route('admin.dashboard') }}">Dashboards</a>
+                    <a href="{{ route('admin.packages.index') }}">Pages</a>
+                    <a href="{{ route('admin.transactions') }}" class="active">Apps</a>
+                @else
+                    <a href="{{ route('user.dashboard') }}" class="active">Dashboards</a>
+                    <a href="{{ route('landing') }}">Pages</a>
+                @endif
+            </nav>
+        </div>
+        <div class="top-header-right">
+            <div class="top-header-icon">
+                <i class="mdi mdi-magnify"></i>
+            </div>
+            <div class="top-header-icon">
+                <i class="mdi mdi-forum-outline"></i>
+            </div>
+            <div class="top-header-icon">
+                <i class="mdi mdi-bell-outline"></i>
+                <span class="badge">3</span>
+            </div>
+            <div class="top-header-icon">
+                <i class="mdi mdi-view-grid-outline"></i>
+            </div>
+            <div class="top-header-icon">
+                <i class="mdi mdi-brightness-6"></i>
+            </div>
+            <div class="top-header-user">
+                <div class="top-header-user-avatar">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    <span class="online-dot"></span>
+                </div>
+                <span class="top-header-user-name">{{ Auth::user()->name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div class="main-content" id="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="page-title">Transaction Detail</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ Auth::user()->isAdmin() ? route('admin.dashboard') : route('user.dashboard') }}">Home</a></li>
+                            @if(Auth::user()->isAdmin())
+                                <li class="breadcrumb-item"><a href="{{ route('admin.transactions') }}">Transaksi</a></li>
+                            @else
+                                <li class="breadcrumb-item"><a href="{{ route('user.dashboard') }}">Dashboard</a></li>
+                            @endif
+                            <li class="breadcrumb-item active">Detail Transaksi</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="page-actions">
+                    @if(Auth::user()->isAdmin())
+                        <a href="{{ route('admin.transactions') }}" class="btn btn-light btn-soft">
+                            <i class="mdi mdi-arrow-left me-1"></i> Back
+                        </a>
+                    @else
+                        <a href="{{ route('user.dashboard') }}" class="btn btn-light btn-soft">
+                            <i class="mdi mdi-arrow-left me-1"></i> Back
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <div class="card">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Detail Transaksi</h5>
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title">Transaction Details</h5>
+                        <p class="card-subtitle mb-0">Complete transaction information</p>
+                    </div>
                 @if($transaction->transaction_status == 'pending')
-                    <button type="button" class="btn btn-light btn-sm" onclick="checkStatus('{{ $transaction->order_id }}')" id="checkStatusBtn">
-                        <i class="mdi mdi-refresh me-1"></i> Cek Status
+                        <button type="button" class="btn btn-sm btn-primary" onclick="checkStatus('{{ $transaction->order_id }}')" id="checkStatusBtn">
+                            <i class="mdi mdi-refresh me-1"></i> Check Status
                     </button>
                 @endif
+                </div>
             </div>
             <div class="card-body">
                 @if(session('status_check'))
@@ -80,24 +161,25 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
+
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h6 class="text-muted">Order ID</h6>
-                        <p class="h5">{{ $transaction->order_id }}</p>
+                        <h6 class="text-muted mb-2">Order ID</h6>
+                        <p class="h5 mb-0">{{ $transaction->order_id }}</p>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-muted">Status</h6>
-                        <p>
+                        <h6 class="text-muted mb-2">Status</h6>
+                        <p class="mb-0">
                             @if($transaction->transaction_status == 'settlement')
-                                <span class="badge bg-success">Settlement</span>
+                                <span class="badge badge-soft success">Settlement</span>
                             @elseif($transaction->transaction_status == 'pending')
-                                <span class="badge bg-warning">Pending</span>
+                                <span class="badge badge-soft warning">Pending</span>
                             @elseif($transaction->transaction_status == 'cancel')
-                                <span class="badge bg-danger">Cancel</span>
+                                <span class="badge badge-soft danger">Cancel</span>
                             @elseif($transaction->transaction_status == 'expire')
-                                <span class="badge bg-secondary">Expire</span>
+                                <span class="badge badge-soft secondary">Expire</span>
                             @else
-                                <span class="badge bg-info">{{ $transaction->transaction_status }}</span>
+                                <span class="badge badge-soft info">{{ $transaction->transaction_status }}</span>
                             @endif
                         </p>
                     </div>
@@ -107,45 +189,45 @@
 
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h6 class="text-muted">Paket</h6>
-                        <p>{{ $transaction->package_name ?? $transaction->package->name ?? 'N/A' }}</p>
+                        <h6 class="text-muted mb-2">Package</h6>
+                        <p class="mb-0">{{ $transaction->package_name ?? $transaction->package->name ?? 'N/A' }}</p>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-muted">Jumlah</h6>
-                        <p class="h5">Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</p>
+                        <h6 class="text-muted mb-2">Amount</h6>
+                        <p class="h5 mb-0">Rp {{ number_format($transaction->gross_amount, 0, ',', '.') }}</p>
                     </div>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h6 class="text-muted">Pelanggan</h6>
-                        <p>
-                            {{ $transaction->customer_name ?? $transaction->user->name }}<br>
+                        <h6 class="text-muted mb-2">Customer</h6>
+                        <p class="mb-0">
+                            <strong>{{ $transaction->customer_name ?? $transaction->user->name }}</strong><br>
                             <small class="text-muted">{{ $transaction->customer_email ?? $transaction->user->email }}</small>
                         </p>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-muted">Metode Pembayaran</h6>
-                        <p>{{ $transaction->payment_method ?? $transaction->payment_type ?? 'N/A' }}</p>
+                        <h6 class="text-muted mb-2">Payment Method</h6>
+                        <p class="mb-0">{{ $transaction->payment_method ?? $transaction->payment_type ?? 'N/A' }}</p>
                     </div>
                 </div>
 
                 <div class="row mb-4">
                     <div class="col-md-6">
-                        <h6 class="text-muted">Tanggal Transaksi</h6>
-                        <p>{{ $transaction->transaction_time ? $transaction->transaction_time->format('d M Y H:i') : $transaction->created_at->format('d M Y H:i') }}</p>
+                        <h6 class="text-muted mb-2">Transaction Date</h6>
+                        <p class="mb-0">{{ $transaction->transaction_time ? $transaction->transaction_time->format('d M Y H:i') : $transaction->created_at->format('d M Y H:i') }}</p>
                     </div>
                     <div class="col-md-6">
-                        <h6 class="text-muted">Tanggal Settlement</h6>
-                        <p>{{ $transaction->settlement_time ? $transaction->settlement_time->format('d M Y H:i') : '-' }}</p>
+                        <h6 class="text-muted mb-2">Settlement Date</h6>
+                        <p class="mb-0">{{ $transaction->settlement_time ? $transaction->settlement_time->format('d M Y H:i') : '-' }}</p>
                     </div>
                 </div>
 
                 @if($transaction->transaction_id)
                 <div class="row mb-4">
                     <div class="col-md-12">
-                        <h6 class="text-muted">Transaction ID (Midtrans)</h6>
-                        <p>{{ $transaction->transaction_id }}</p>
+                        <h6 class="text-muted mb-2">Transaction ID (Midtrans)</h6>
+                        <p class="mb-0">{{ $transaction->transaction_id }}</p>
                     </div>
                 </div>
                 @endif
@@ -153,12 +235,12 @@
                 @if($transaction->fraud_status)
                 <div class="row mb-4">
                     <div class="col-md-12">
-                        <h6 class="text-muted">Fraud Status</h6>
-                        <p>
+                        <h6 class="text-muted mb-2">Fraud Status</h6>
+                        <p class="mb-0">
                             @if($transaction->fraud_status == 'accept')
-                                <span class="badge bg-success">Accept</span>
+                                <span class="badge badge-soft success">Accept</span>
                             @else
-                                <span class="badge bg-warning">{{ $transaction->fraud_status }}</span>
+                                <span class="badge badge-soft warning">{{ $transaction->fraud_status }}</span>
                             @endif
                         </p>
                     </div>
@@ -167,28 +249,36 @@
 
                 @if($transaction->paymentLogs->count() > 0)
                 <hr>
-                <h6 class="mb-3">Payment Logs</h6>
+                <div class="mb-3">
+                    <h5 class="card-title mb-3">Payment Logs</h5>
                 <div class="table-responsive">
-                    <table class="table table-sm">
+                        <table class="table">
                         <thead>
                             <tr>
-                                <th>Action</th>
-                                <th>Status</th>
-                                <th>Message</th>
-                                <th>Tanggal</th>
+                                    <th>ACTION</th>
+                                    <th>STATUS</th>
+                                    <th>MESSAGE</th>
+                                    <th>DATE</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($transaction->paymentLogs as $log)
                                 <tr>
-                                    <td>{{ $log->action }}</td>
-                                    <td>{{ $log->status }}</td>
+                                        <td><strong>{{ $log->action }}</strong></td>
+                                        <td>
+                                            @if($log->status == 'success')
+                                                <span class="badge badge-soft success">Success</span>
+                                            @else
+                                                <span class="badge badge-soft danger">{{ $log->status }}</span>
+                                            @endif
+                                        </td>
                                     <td>{{ $log->message }}</td>
                                     <td>{{ $log->created_at->format('d M Y H:i') }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
                 @endif
 
@@ -196,16 +286,15 @@
                 <div class="mt-4">
                     @if(Auth::user()->isAdmin())
                         <a href="{{ route('admin.transaction.invoice', $transaction->id) }}" class="btn btn-primary" target="_blank">
-                            <i class="mdi mdi-file-document me-2"></i> Lihat Invoice
+                            <i class="mdi mdi-file-document me-2"></i> View Invoice
                         </a>
                     @else
                         <a href="{{ route('user.invoice.download', $transaction->id) }}" class="btn btn-primary" target="_blank">
-                            <i class="mdi mdi-file-document me-2"></i> Lihat Invoice
+                            <i class="mdi mdi-file-document me-2"></i> View Invoice
                         </a>
                     @endif
                 </div>
                 @endif
-            </div>
         </div>
     </div>
     </div>
@@ -219,7 +308,7 @@
             const originalText = btn.innerHTML;
             
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengecek...';
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Checking...';
             
             fetch(`/payment/check-status/${orderId}`, {
                 method: 'GET',
@@ -231,22 +320,48 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Reload page to show updated status
                     window.location.reload();
                 } else {
-                    alert('Gagal mengecek status: ' + (data.message || 'Unknown error'));
+                    alert('Failed to check status: ' + (data.message || 'Unknown error'));
                     btn.disabled = false;
                     btn.innerHTML = originalText;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Terjadi kesalahan saat mengecek status');
+                alert('An error occurred while checking status');
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             });
         }
+
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('sidebar-toggle-icon');
+            
+            if (!sidebar) return;
+            
+            sidebar.classList.toggle('collapsed');
+            
+            if (toggleIcon) {
+                if (sidebar.classList.contains('collapsed')) {
+                    toggleIcon.classList.remove('mdi-chevron-left');
+                    toggleIcon.classList.add('mdi-chevron-right');
+                } else {
+                    toggleIcon.classList.remove('mdi-chevron-right');
+                    toggleIcon.classList.add('mdi-chevron-left');
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('show');
+            }
+        }
     </script>
 </body>
 </html>
-

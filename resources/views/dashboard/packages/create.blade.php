@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Paket - OMILE</title>
+    <title>Add Product - OMILE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.2.96/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/alert-animations.css') }}">
 </head>
 <body>
+    <!-- Mobile Toggle -->
     <button class="sidebar-mobile-toggle" onclick="toggleSidebar()">
         <i class="mdi mdi-menu"></i>
     </button>
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
+    <!-- Dark Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <img src="{{ asset('assets/images/favicon.ico') }}" alt="OMILE Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div style="display: none; width: 40px; height: 40px; background: linear-gradient(135deg, #2f55d4 0%, #f58905 100%); border-radius: 8px; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.2rem;">O</div>
+                <div class="logo-fallback">O</div>
                 <div class="sidebar-logo-text">
                     <h4>OMILE</h4>
                     <small>Admin Panel</small>
@@ -29,7 +31,7 @@
                 <i class="mdi mdi-chevron-left" id="sidebar-toggle-icon"></i>
             </button>
         </div>
-        <nav class="nav flex-column">
+        <nav class="sidebar-nav">
             <a class="nav-link" href="{{ route('admin.dashboard') }}" data-tooltip="Dashboard">
                 <i class="mdi mdi-view-dashboard"></i>
                 <span class="nav-text">Dashboard</span>
@@ -46,20 +48,65 @@
                 <i class="mdi mdi-home"></i>
                 <span class="nav-text">Landing Page</span>
             </a>
+            <div class="sidebar-sep"></div>
             <form action="{{ route('logout') }}" method="POST" class="px-3 mt-3">
                 @csrf
-                <button type="submit" class="btn btn-outline-light w-100" id="logout-btn">
-                    <i class="mdi mdi-logout me-2"></i>
+                <button type="submit" class="nav-link w-100 text-start" style="background: transparent; border: none; cursor: pointer;" id="logout-btn">
+                    <i class="mdi mdi-logout"></i>
                     <span class="logout-text">Logout</span>
                 </button>
             </form>
         </nav>
     </div>
 
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="top-header-left">
+            <nav class="top-header-nav">
+                <a href="{{ route('admin.dashboard') }}">Dashboards</a>
+                <a href="{{ route('admin.packages.index') }}" class="active">Pages</a>
+                <a href="{{ route('admin.transactions') }}">Apps</a>
+            </nav>
+        </div>
+        <div class="top-header-right">
+            
+            <div class="top-header-icon">
+                <i class="mdi mdi-brightness-6"></i>
+            </div>
+            <div class="top-header-user">
+                <div class="top-header-user-avatar">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    <span class="online-dot"></span>
+                </div>
+                <span class="top-header-user-name">{{ Auth::user()->name }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div class="main-content" id="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="page-title">Tambah Paket</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.packages.index') }}">Manajemen Paket</a></li>
+                            <li class="breadcrumb-item active">Tambah Paket</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Tambah Paket Baru</h5>
+            <div class="card-header">
+                <div>
+                    <h5 class="card-title">Tambah Paket Baru</h5>
+                    <p class="card-subtitle mb-0">Tambahkan paket baru ke dalam sistem</p>
+                </div>
             </div>
             <div class="card-body">
                 @if(session('success'))
@@ -109,14 +156,14 @@
                     </div>
 
                     <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="price" class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
-                                    <input type="number" class="form-control @error('price') is-invalid @enderror" 
-                                           id="price" name="price" value="{{ old('price') }}" min="0" step="1" required>
-                                    @error('price')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">Price (Rp) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control @error('price') is-invalid @enderror" 
+                                   id="price" name="price" value="{{ old('price') }}" min="0" step="1" required>
+                            @error('price')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
 
                         <div class="col-md-6 mb-3">
                             <label for="duration_days" class="form-label">Durasi (Hari) <span class="text-danger">*</span></label>
@@ -157,7 +204,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ route('admin.packages.index') }}" class="btn btn-secondary">Batal</a>
+                        <a href="{{ route('admin.packages.index') }}" class="btn btn-light btn-soft">Batal</a>
                         <button type="submit" class="btn btn-primary">
                             <i class="mdi mdi-content-save me-2"></i> Simpan
                         </button>
@@ -180,7 +227,7 @@
             featureDiv.id = `feature-${featureIndex}`;
             
             featureDiv.innerHTML = `
-                <div class="row align-items-center">
+                <div class="row align-items-center g-3">
                     <div class="col-md-8">
                         <input type="text" 
                                class="form-control" 
@@ -189,7 +236,7 @@
                                value="${text}">
                     </div>
                     <div class="col-md-3">
-                        <div class="form-check">
+                        <div class="form-check d-flex align-items-center h-100">
                             <input type="hidden" name="features[${featureIndex}][included]" value="0">
                             <input class="form-check-input" 
                                    type="checkbox" 
@@ -203,7 +250,7 @@
                         </div>
                     </div>
                     <div class="col-md-1">
-                        <button type="button" class="btn btn-sm btn-danger" onclick="removeFeature(${featureIndex})">
+                        <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeFeature(${featureIndex})" title="Hapus fitur">
                             <i class="mdi mdi-delete"></i>
                         </button>
                     </div>
@@ -221,12 +268,11 @@
             }
         }
 
-        // Form submission handler - remove required from empty feature inputs
+        // Form submission handler - remove empty feature inputs
         document.getElementById('packageForm').addEventListener('submit', function(e) {
             const featureInputs = document.querySelectorAll('#featuresContainer input[name*="[text]"]');
             featureInputs.forEach(function(input) {
                 if (!input.value.trim()) {
-                    // Remove the entire feature item if text is empty
                     const featureItem = input.closest('.feature-item');
                     if (featureItem) {
                         featureItem.remove();
@@ -235,10 +281,33 @@
             });
         });
 
-        // Add initial feature on page load (optional)
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     addFeature();
-        // });
+        function toggleSidebarCollapse() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('sidebar-toggle-icon');
+            
+            if (!sidebar) return;
+            
+            sidebar.classList.toggle('collapsed');
+            
+            if (toggleIcon) {
+                if (sidebar.classList.contains('collapsed')) {
+                    toggleIcon.classList.remove('mdi-chevron-left');
+                    toggleIcon.classList.add('mdi-chevron-right');
+                } else {
+                    toggleIcon.classList.remove('mdi-chevron-right');
+                    toggleIcon.classList.add('mdi-chevron-left');
+                }
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('show');
+            }
+        }
     </script>
 </body>
 </html>
