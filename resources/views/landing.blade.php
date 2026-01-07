@@ -406,9 +406,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="#">
-                                    <i class="mdi mdi-account"></i> Profile
-                                </a>
+                             
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
