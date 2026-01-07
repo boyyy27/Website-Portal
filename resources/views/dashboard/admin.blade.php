@@ -47,6 +47,10 @@
                 <i class="mdi mdi-cash-multiple"></i>
                 <span class="nav-text">Semua Transaksi</span>
             </a>
+            <a class="nav-link" href="{{ route('admin.customers.index') }}" data-tooltip="Manajemen Customer">
+                <i class="mdi mdi-account-group"></i>
+                <span class="nav-text">Customer</span>
+            </a>
             <a class="nav-link" href="{{ route('landing') }}" data-tooltip="Landing Page">
                 <i class="mdi mdi-home"></i>
                 <span class="nav-text">Landing Page</span>
@@ -114,14 +118,7 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="page-actions">
-                    <button class="btn btn-light btn-soft">
-                        <i class="mdi mdi-filter-outline"></i> Filter
-                    </button>
-                    <button class="btn btn-primary">
-                        <i class="mdi mdi-plus"></i> Add Product
-                    </button>
-                </div>
+              
             </div>
         </div>
 

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TmsController;
@@ -56,6 +57,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/edit', [PackageController::class, 'edit'])->name('edit');
         Route::put('/{id}', [PackageController::class, 'update'])->name('update');
         Route::delete('/{id}', [PackageController::class, 'destroy'])->name('destroy');
+    });
+    
+    // Customer Management Routes (Admin Only)
+    Route::prefix('admin/customers')->name('admin.customers.')->group(function () {
+        Route::get('/', [CustomerController::class, 'index'])->name('index');
     });
     
     // Payment Routes
